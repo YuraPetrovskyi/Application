@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organizedEvents Event[]            @relation("OrganizerEvents")
+  participations  EventParticipant[]
+}
+
+model Event {
+  id          String      @id @default(uuid())
+  title       String
+  description String
+  dateTime    DateTime
+  location    String
+  capacity    Int?
+  visibility  Visibility  @default(PUBLIC)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  organizerId  String
+  organizer    User               @relation("OrganizerEvents", fields: [organizerId], references: [id], onDelete: Cascade)
+  participants EventParticipant[]
+}
+
+model EventParticipant {
+  id       String @id @default(uuid())
+  userId   String
+  eventId  String
+  joinedAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+}
+
+enum Visibility {
+  PUBLIC
+  PRIVATE
+}
