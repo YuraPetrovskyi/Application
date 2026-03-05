@@ -102,7 +102,7 @@ export class EventsService {
         ...(dto.description && { description: dto.description }),
         ...(dto.dateTime && { dateTime: new Date(dto.dateTime) }),
         ...(dto.location && { location: dto.location }),
-        ...(dto.capacity !== undefined && { capacity: dto.capacity }),
+        ...('capacity' in dto && { capacity: dto.capacity ?? null }),
         ...(dto.visibility && { visibility: dto.visibility }),
       },
       include: {

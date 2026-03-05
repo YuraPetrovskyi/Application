@@ -30,7 +30,7 @@ export class CreateEventDto {
   @IsOptional()
   @IsInt()
   @Min(1)
-  capacity?: number;
+  capacity?: number | null;
 
   @ApiPropertyOptional({ enum: Visibility, default: Visibility.PUBLIC })
   @IsOptional()
