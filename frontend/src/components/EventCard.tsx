@@ -4,6 +4,7 @@ import type { Event } from "../types";
 import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
 import { joinEvent, leaveEvent } from "../store/slices/eventsSlice";
 import toast from "react-hot-toast";
+import { Calendar, MapPin, Users, Clock4 } from "lucide-react";
 
 interface Props {
   event: Event;
@@ -38,35 +39,72 @@ export default function EventCard({ event }: Props) {
     }
   };
 
+  const renderAction = () => {
+    if (event.isOrganizer) {
+      return (
+        <div className="bg-indigo-50 text-indigo-600 px-3 py-2 rounded-lg font-medium text-center">
+          Your Event
+        </div>
+      );
+    }
+
+    if (event.isFull && !event.isJoined) {
+      return (
+        <div className="bg-gray-100 text-gray-600 px-3 py-2 rounded-lg font-medium text-center">
+          Event is Full
+        </div>
+      );
+    }
+
+    if (event.isJoined) {
+      return (
+        <button
+          onClick={handleLeave}
+          className="w-full bg-red-50 text-red-600 hover:bg-red-100 px-3 py-2 rounded-lg font-medium transition-colors"
+        >
+          Leave Event
+        </button>
+      );
+    }
+
+    return (
+      <button
+        onClick={handleJoin}
+        className="w-full bg-green-600 text-white hover:bg-green-700 px-3 py-2 rounded-lg font-medium transition-colors"
+      >
+        Join Event
+      </button>
+    );
+  };
+
   return (
     <div
       onClick={() => navigate(`/events/${event.id}`)}
-      className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md hover:border-indigo-200 transition-all cursor-pointer"
+      className="flex flex-col gap-3 justify-between rounded-xl border border-gray-200 p-5 hover:shadow-md hover:border-indigo-200 transition-all cursor-pointer"
     >
       <div className="flex items-start justify-between gap-2">
-        <h3 className="font-semibold text-gray-900 text-lg leading-tight">
+        <h3 className="font-semibold text-gray-900 text-lg leading-tight line-clamp-1">
           {event.title}
         </h3>
-        <span className="shrink-0 text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded-full font-medium">
-          {event.visibility}
-        </span>
       </div>
 
-      <p className="text-gray-500 text-sm mt-2 line-clamp-2">
-        {event.description}
-      </p>
+      <p className="text-gray-500 text-sm line-clamp-2">{event.description}</p>
 
-      <div className="mt-4 space-y-1 text-sm text-gray-600">
+      <div className="mt-4 space-y-1.5 text-sm text-gray-600">
         <div className="flex items-center gap-2">
-          <span>📅</span>
-          <span>{dayjs(event.dateTime).format("MMM D, YYYY · HH:mm")}</span>
+          <Calendar size={14} className="text-gray-400 shrink-0" />
+          <span>{dayjs(event.dateTime).format("MMM D, YYYY")}</span>
         </div>
         <div className="flex items-center gap-2">
-          <span>📍</span>
+          <Clock4 size={14} className="text-gray-400 shrink-0" />
+          <span>{dayjs(event.dateTime).format("HH:mm")}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <MapPin size={14} className="text-gray-400 shrink-0" />
           <span>{event.location}</span>
         </div>
         <div className="flex items-center gap-2">
-          <span>👥</span>
+          <Users size={14} className="text-gray-400 shrink-0" />
           <span>
             {event.participantCount}
             {event.capacity ? ` / ${event.capacity}` : ""} participants
@@ -74,29 +112,9 @@ export default function EventCard({ event }: Props) {
         </div>
       </div>
 
-      <div className="mt-4 flex items-center justify-between">
-        <span className="text-xs text-gray-400">by {event.organizer.name}</span>
-        {!event.isOrganizer &&
-          (event.isFull && !event.isJoined ? (
-            <span className="text-xs bg-gray-100 text-gray-400 px-3 py-1.5 rounded-lg font-medium cursor-not-allowed">
-              Full
-            </span>
-          ) : event.isJoined ? (
-            <button
-              onClick={handleLeave}
-              className="text-xs bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1.5 rounded-lg font-medium transition-colors"
-            >
-              Leave
-            </button>
-          ) : (
-            <button
-              onClick={handleJoin}
-              className="text-xs bg-indigo-600 text-white hover:bg-indigo-700 px-3 py-1.5 rounded-lg font-medium transition-colors"
-            >
-              Join
-            </button>
-          ))}
-      </div>
+      <div className="h-[1px] bg-gray-200"></div>
+
+      <div>{renderAction()}</div>
     </div>
   );
 }

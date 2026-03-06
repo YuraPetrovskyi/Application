@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
 import { createEvent } from "../store/slices/eventsSlice";
 import toast from "react-hot-toast";
+import { ArrowLeft } from "lucide-react";
 
 interface FormData {
   title: string;
@@ -48,22 +49,30 @@ export default function CreateEventPage() {
 
   const inputClass =
     "w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent";
-  const labelClass = "block text-sm font-medium text-gray-700 mb-1";
+  const labelClass = "block text-sm font-bold text-gray-700 mb-1";
   const errorClass = "text-red-500 text-xs mt-1";
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Create Event</h1>
-        <p className="text-gray-500 mt-1">
-          Fill in the details for your new event
-        </p>
-      </div>
-
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center gap-1.5 text-gray-500 hover:text-indigo-600 mb-6 text-sm transition-colors"
+      >
+        <ArrowLeft size={16} />
+        Back
+      </button>
       <div className="bg-white rounded-2xl border border-gray-200 p-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Create New Event</h1>
+          <p className="text-gray-500 mt-1">
+            Fill in the details for your new event
+          </p>
+        </div>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
-            <label className={labelClass}>Event Title *</label>
+            <label className={labelClass}>
+              Event Title <span className="text-red-500">*</span>
+            </label>
             <input
               {...register("title", { required: "Title is required" })}
               placeholder="e.g. Tech Conference 2026"
@@ -78,7 +87,7 @@ export default function CreateEventPage() {
             <label className={labelClass}>Description</label>
             <textarea
               {...register("description")}
-              placeholder="Describe your event..."
+              placeholder="Describe what makes your event special..."
               rows={4}
               className={inputClass + " resize-none"}
             />
@@ -86,7 +95,9 @@ export default function CreateEventPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className={labelClass}>Date *</label>
+              <label className={labelClass}>
+                Date <span className="text-red-500">*</span>
+              </label>
               <input
                 {...register("date", {
                   required: "Date is required",
@@ -100,7 +111,9 @@ export default function CreateEventPage() {
             </div>
 
             <div>
-              <label className={labelClass}>Time *</label>
+              <label className={labelClass}>
+                Time <span className="text-red-500">*</span>
+              </label>
               <input
                 {...register("time", { required: "Time is required" })}
                 type="time"
@@ -110,6 +123,20 @@ export default function CreateEventPage() {
                 <p className={errorClass}>{errors.time.message}</p>
               )}
             </div>
+          </div>
+
+          <div>
+            <label className={labelClass}>
+              Location <span className="text-red-500">*</span>
+            </label>
+            <input
+              {...register("location", { required: "Location is required" })}
+              placeholder="e.g. Convention Center, San Francisco"
+              className={inputClass}
+            />
+            {errors.location && (
+              <p className={errorClass}>{errors.location.message}</p>
+            )}
           </div>
 
           <div>
@@ -123,46 +150,42 @@ export default function CreateEventPage() {
               })}
               type="number"
               min="1"
-              placeholder="Unlimited if empty"
+              placeholder="Leave empty for unlimited"
               className={inputClass}
             />
+            <p className="text-sm text-gray-400 mt-1">
+              Maximum number of participants. Leave empty for unlimited
+              capacity.
+            </p>
             {errors.capacity && (
               <p className={errorClass}>{errors.capacity.message}</p>
             )}
           </div>
 
           <div>
-            <label className={labelClass}>Location *</label>
-            <input
-              {...register("location", { required: "Location is required" })}
-              placeholder="e.g. Kyiv, Ukraine"
-              className={inputClass}
-            />
-            {errors.location && (
-              <p className={errorClass}>{errors.location.message}</p>
-            )}
-          </div>
-
-          <div>
             <label className={labelClass}>Visibility</label>
-            <div className="flex gap-6 mt-2">
+            <div className="flex flex-col gap-2 mt-2">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   {...register("visibility")}
                   type="radio"
                   value="PUBLIC"
-                  className="text-indigo-600"
+                  className="accent-blue-600"
                 />
-                <span className="text-sm text-gray-700">Public</span>
+                <span className="text-sm text-gray-700">
+                  Public - Anyone can see and join this event
+                </span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   {...register("visibility")}
                   type="radio"
                   value="PRIVATE"
-                  className="text-indigo-600"
+                  className="accent-blue-600"
                 />
-                <span className="text-sm text-gray-700">Private</span>
+                <span className="text-sm text-gray-700">
+                  Private - Only invited people can see this event
+                </span>
               </label>
             </div>
           </div>
