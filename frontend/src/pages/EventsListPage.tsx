@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import dayjs from "dayjs";
 import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
 import { fetchEvents } from "../store/slices/eventsSlice";
 import EventCard from "../components/EventCard";
@@ -11,6 +12,11 @@ export default function EventsListPage() {
   useEffect(() => {
     dispatch(fetchEvents());
   }, []);
+
+  const todayStart = dayjs().startOf("day");
+  const upcomingEvents = events.filter(
+    (e) => !dayjs(e.dateTime).isBefore(todayStart),
+  );
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -29,7 +35,7 @@ export default function EventsListPage() {
         </div>
       )}
 
-      {!loading && events.length === 0 && (
+      {!loading && upcomingEvents.length === 0 && (
         <div className="text-center py-20 text-gray-400">
           <p className="text-xl">No events yet</p>
           <p className="mt-1">Be the first to create one!</p>
@@ -37,7 +43,7 @@ export default function EventsListPage() {
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {events.map((event) => (
+        {upcomingEvents.map((event) => (
           <EventCard key={event.id} event={event} />
         ))}
       </div>
