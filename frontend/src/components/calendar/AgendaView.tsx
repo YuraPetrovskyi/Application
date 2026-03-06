@@ -70,12 +70,12 @@ export default function AgendaView({
                 <button
                   key={e.id}
                   onClick={() => onSelectEvent(e)}
-                  className="w-full text-left px-5 py-3 flex items-center gap-4 hover:bg-gray-50 transition-colors"
+                  className="w-full text-left px-5 py-3 flex items-center gap-4 hover:bg-gray-200 transition-colors"
                 >
-                  <span className="text-sm text-gray-400 w-12 shrink-0 font-medium">
+                  <span className="text-sm text-gray-500 w-12 shrink-0 font-medium">
                     {dayjs(e.start).format("H:mm")}
                   </span>
-                  <span className="flex-1 min-w-0 text-sm font-medium text-indigo-700 truncate">
+                  <span className="flex-1 min-w-0 text-sm font-medium text-gray-700 truncate">
                     {e.title}
                   </span>
                 </button>

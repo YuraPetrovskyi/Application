@@ -43,18 +43,15 @@ export default function DayView({ events, currentDate, onSelectEvent }: Props) {
             <button
               key={e.id}
               onClick={() => onSelectEvent(e)}
-              className="w-full text-left px-6 py-4 flex items-center gap-4 hover:bg-gray-50 transition-colors"
+              className="w-full text-left px-6 py-4 flex items-center gap-4 hover:bg-gray-200 transition-colors"
             >
               <div className="text-center shrink-0 w-14">
-                <p className="text-base font-bold text-indigo-600">
+                <p className="text-base font-bold text-gray-600">
                   {dayjs(e.start).format("H:mm")}
-                </p>
-                <p className="text-xs text-gray-400">
-                  {dayjs(e.end).format("H:mm")}
                 </p>
               </div>
               <div className="w-0.5 h-9 bg-indigo-200 rounded-full shrink-0" />
-              <p className="flex-1 text-sm font-semibold text-gray-900 truncate">
+              <p className="flex-1 text-sm font-semibold text-gray-700 truncate">
                 {e.title}
               </p>
             </button>
