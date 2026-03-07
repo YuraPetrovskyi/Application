@@ -91,14 +91,11 @@ export default function EventDetailsPage() {
       </button>
 
       <div className="bg-white rounded-2xl border border-gray-200 p-8">
-        <div className="flex items-start justify-between gap-4 mb-6">
+        <div className="flex flex-wrap items-start justify-between gap-2 mb-6 ">
           <div>
             <span className="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded-lg font-medium">
               {event.visibility}
             </span>
-            <h1 className="text-3xl font-bold text-gray-900 mt-3">
-              {event.title}
-            </h1>
           </div>
           {event.isOrganizer && (
             <div className="flex gap-2 shrink-0">
@@ -120,7 +117,11 @@ export default function EventDetailsPage() {
           )}
         </div>
 
-        <p className="text-gray-600 leading-relaxed mb-6 text-lg font-medium">
+        <h1 className="text-3xl font-bold text-gray-900 mt-2 mb-4">
+          {event.title}
+        </h1>
+
+        <p className="text-gray-600 leading-relaxed mb-6 text-lg font-medium break-words">
           {event.description}
         </p>
 

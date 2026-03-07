@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
 import { logout } from "../store/slices/authSlice";
@@ -9,6 +9,13 @@ export default function Navbar() {
   const navigate = useNavigate();
   const { user } = useAppSelector((s) => s.auth);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -98,9 +105,9 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile dropdown */}
+      {/* Mobile fullscreen menu */}
       {menuOpen && (
-        <div className="md:hidden border-t border-gray-100 bg-white px-4 py-3 flex flex-col gap-1">
+        <div className="md:hidden fixed inset-0 top-16 bg-white z-40 flex flex-col px-6 py-6 gap-2 overflow-y-auto">
           <Link
             to="/"
             onClick={close}
