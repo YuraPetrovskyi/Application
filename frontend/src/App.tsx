@@ -12,14 +12,17 @@ import EditEventPage from "./pages/EditEventPage";
 import MyEventsPage from "./pages/MyEventsPage";
 import { useAppDispatch, useAppSelector } from "./hooks/useAppStore";
 import { fetchMe } from "./store/slices/authSlice";
+import LoadingSpinner from "./components/LoadingSpinner";
 
 function AppRoutes() {
   const dispatch = useAppDispatch();
-  const { token } = useAppSelector((s) => s.auth);
+  const { token, user, initializing } = useAppSelector((s) => s.auth);
 
   useEffect(() => {
     if (token) dispatch(fetchMe());
-  }, [token]);
+  }, []);
+
+  if (initializing) return <LoadingSpinner />;
 
   return (
     <>
@@ -27,8 +30,14 @@ function AppRoutes() {
       <main>
         <Routes>
           <Route path="/" element={<EventsListPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+          <Route
+            path="/login"
+            element={user ? <Navigate to="/" replace /> : <LoginPage />}
+          />
+          <Route
+            path="/register"
+            element={user ? <Navigate to="/" replace /> : <RegisterPage />}
+          />
           <Route path="/events/:id" element={<EventDetailsPage />} />
           <Route
             path="/events/create"

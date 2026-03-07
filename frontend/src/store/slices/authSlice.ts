@@ -8,6 +8,7 @@ interface AuthState {
   token: string | null;
   loading: boolean;
   error: string | null;
+  initializing: boolean;
 }
 
 const initialState: AuthState = {
@@ -15,6 +16,7 @@ const initialState: AuthState = {
   token: localStorage.getItem("token"),
   loading: false,
   error: null,
+  initializing: !!localStorage.getItem("token"),
 };
 
 export const register = createAsyncThunk(
@@ -69,9 +71,6 @@ const authSlice = createSlice({
       state.token = null;
       localStorage.removeItem("token");
     },
-    clearError(state) {
-      state.error = null;
-    },
   },
   extraReducers: (builder) => {
     builder
@@ -111,9 +110,16 @@ const authSlice = createSlice({
       })
       .addCase(fetchMe.fulfilled, (state, action: PayloadAction<User>) => {
         state.user = action.payload;
+        state.initializing = false;
+      })
+      .addCase(fetchMe.rejected, (state) => {
+        state.token = null;
+        state.user = null;
+        state.initializing = false;
+        localStorage.removeItem("token");
       });
   },
 });
 
-export const { logout, clearError } = authSlice.actions;
+export const { logout } = authSlice.actions;
 export default authSlice.reducer;

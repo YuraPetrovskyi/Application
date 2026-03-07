@@ -1,8 +1,8 @@
-import { useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
-import { login, clearError } from "../store/slices/authSlice";
+import { login } from "../store/slices/authSlice";
 import toast from "react-hot-toast";
 
 interface FormData {
@@ -13,7 +13,8 @@ interface FormData {
 export default function LoginPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { loading, error, token } = useAppSelector((s) => s.auth);
+  const { loading } = useAppSelector((s) => s.auth);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const {
     register,
@@ -21,20 +22,16 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm<FormData>();
 
-  useEffect(() => {
-    if (token) navigate("/");
-    return () => {
-      dispatch(clearError());
-    };
-  }, [token]);
-
   const onSubmit = async (data: FormData) => {
-    try {
-      await dispatch(login(data)).unwrap();
+    setFormError(null);
+    const result = await dispatch(login(data));
+    if (login.rejected.match(result)) {
+      const msg = (result.payload as string) || "Invalid email or password";
+      setFormError(msg);
+      toast.error(msg);
+    } else {
       toast.success("Welcome back!");
       navigate("/");
-    } catch {
-      // error shown from state
     }
   };
 
@@ -47,9 +44,9 @@ export default function LoginPage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-          {error && (
+          {formError && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-              {error}
+              {formError}
             </div>
           )}
 
