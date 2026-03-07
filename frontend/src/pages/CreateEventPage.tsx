@@ -23,6 +23,8 @@ export default function CreateEventPage() {
   const {
     register,
     handleSubmit,
+    getValues,
+    trigger,
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: { visibility: "PUBLIC" },
@@ -101,6 +103,11 @@ export default function CreateEventPage() {
               <input
                 {...register("date", {
                   required: "Date is required",
+                  validate: (v) =>
+                    !v || new Date(v) >= new Date(new Date().toDateString())
+                      ? true
+                      : "Cannot create events in the past",
+                  onChange: () => trigger("time"),
                 })}
                 type="date"
                 className={inputClass}
@@ -115,7 +122,16 @@ export default function CreateEventPage() {
                 Time <span className="text-red-500">*</span>
               </label>
               <input
-                {...register("time", { required: "Time is required" })}
+                {...register("time", {
+                  required: "Time is required",
+                  validate: (v) => {
+                    const date = getValues("date");
+                    if (!date || !v) return true;
+                    return new Date(`${date}T${v}`) > new Date()
+                      ? true
+                      : "Cannot create events in the past";
+                  },
+                })}
                 type="time"
                 className={inputClass}
               />

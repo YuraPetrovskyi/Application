@@ -28,6 +28,8 @@ export default function EditEventPage() {
     register,
     handleSubmit,
     reset,
+    getValues,
+    trigger,
     formState: { errors },
   } = useForm<FormData>({ mode: "onTouched" });
 
@@ -119,7 +121,14 @@ export default function EditEventPage() {
                 Date <span className="text-red-500">*</span>
               </label>
               <input
-                {...register("date", { required: "Date is required" })}
+                {...register("date", {
+                  required: "Date is required",
+                  validate: (v) =>
+                    !v || new Date(v) >= new Date(new Date().toDateString())
+                      ? true
+                      : "Cannot set event date in the past",
+                  onChange: () => trigger("time"),
+                })}
                 type="date"
                 className={inputClass}
               />
@@ -132,7 +141,16 @@ export default function EditEventPage() {
                 Time <span className="text-red-500">*</span>
               </label>
               <input
-                {...register("time", { required: "Time is required" })}
+                {...register("time", {
+                  required: "Time is required",
+                  validate: (v) => {
+                    const date = getValues("date");
+                    if (!date || !v) return true;
+                    return new Date(`${date}T${v}`) > new Date()
+                      ? true
+                      : "Cannot set event date in the past";
+                  },
+                })}
                 type="time"
                 className={inputClass}
               />
