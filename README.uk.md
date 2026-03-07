@@ -110,20 +110,14 @@ cd ../frontend && npm install
 
 **2. Налаштуй змінні середовища**
 
-Створи `backend/.env`:
+Скопіюй вручну або використай команду (macOS/Linux/Git Bash):
 
-```env
-DATABASE_URL="postgresql://postgres:your-password@localhost:5432/event_management"
-JWT_SECRET="your-secret-key"
-JWT_EXPIRES_IN="7d"
-PORT=3000
+```bash
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
 ```
 
-Створи `frontend/.env`:
-
-```env
-VITE_API_URL="http://localhost:3000"
-```
+Відкрий `backend/.env` і встанови пароль PostgreSQL та безпечний `JWT_SECRET`.
 
 **3. Налаштуй базу даних**
 
@@ -195,18 +189,47 @@ cd frontend && npm run dev
 
 ```
 Application/
-├── backend/                # NestJS API
-│   ├── prisma/             # Схема, міграції, seed
+├── backend/                        # NestJS REST API
+│   ├── prisma/
+│   │   ├── schema.prisma           ← схема БД: User, Event, EventParticipant
+│   │   ├── migrations/             ← SQL міграції
+│   │   └── seed.ts                 ← демо-дані (2 користувачі, 3 події)
 │   └── src/
-│       ├── auth/           # JWT автентифікація
-│       ├── events/         # Модуль подій
-│       ├── prisma/         # Prisma сервіс
-│       └── users/          # Модуль користувачів
-├── frontend/               # React + Vite SPA
+│       ├── auth/                   ← POST /auth/register, POST /auth/login
+│       │   ├── dto/auth.dto.ts     ← RegisterDto, LoginDto (class-validator)
+│       │   ├── auth.service.ts     ← bcrypt хешування, підпис JWT
+│       │   ├── auth.controller.ts
+│       │   ├── jwt.strategy.ts     ← перевірка Bearer токена на кожен запит
+│       │   ├── jwt-auth.guard.ts   ← захист приватних endpoints
+│       │   └── optional-jwt-auth.guard.ts  ← передає user якщо токен є
+│       ├── events/                 ← CRUD + join/leave
+│       │   ├── dto/event.dto.ts    ← CreateEventDto, UpdateEventDto
+│       │   ├── events.service.ts   ← бізнес-логіка, Prisma запити
+│       │   └── events.controller.ts
+│       ├── users/                  ← GET /users/me, GET /users/me/events
+│       ├── prisma/                 ← PrismaService (глобальний DB клієнт)
+│       ├── app.module.ts
+│       └── main.ts                 ← Swagger /api/docs, ValidationPipe, CORS
+├── frontend/                       # React 18 + Vite SPA
 │   └── src/
-│       ├── components/     # Спільні компоненти + календар
-│       ├── pages/          # Сторінки (роути)
-│       └── store/          # Redux слайси
-├── docker-compose.yml
+│       ├── api/axios.ts            ← Axios з JWT interceptor
+│       ├── store/
+│       │   ├── slices/authSlice.ts     ← login, register, fetchMe
+│       │   └── slices/eventsSlice.ts   ← CRUD подій, join/leave
+│       ├── pages/
+│       │   ├── LoginPage           ← /login
+│       │   ├── RegisterPage        ← /register
+│       │   ├── EventsListPage      ← / (публічні події, тільки майбутні)
+│       │   ├── EventDetailsPage    ← /events/:id
+│       │   ├── CreateEventPage     ← /events/create
+│       │   ├── EditEventPage       ← /events/:id/edit
+│       │   └── MyEventsPage        ← /my-events (кастомний календар)
+│       └── components/
+│           ├── calendar/           ← вигляди: Місяць, Тиждень, День, Порядок, Рік
+│           ├── Navbar.tsx
+│           ├── EventCard.tsx
+│           ├── ProtectedRoute.tsx
+│           └── ConfirmModal.tsx
+├── docker-compose.yml              ← postgres + backend + frontend
 └── .env.example
 ```

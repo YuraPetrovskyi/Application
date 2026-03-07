@@ -110,20 +110,14 @@ cd ../frontend && npm install
 
 **2. Configure environment**
 
-Create `backend/.env`:
+Copy manually or use the command (macOS/Linux/Git Bash):
 
-```env
-DATABASE_URL="postgresql://postgres:your-password@localhost:5432/event_management"
-JWT_SECRET="your-secret-key"
-JWT_EXPIRES_IN="7d"
-PORT=3000
+```bash
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
 ```
 
-Create `frontend/.env`:
-
-```env
-VITE_API_URL="http://localhost:3000"
-```
+Open `backend/.env` and set your PostgreSQL password and a secure `JWT_SECRET`.
 
 **3. Set up the database**
 
@@ -195,18 +189,48 @@ cd frontend && npm run dev
 
 ```
 Application/
-├── backend/                # NestJS API
-│   ├── prisma/             # Schema, migrations, seed
+├── backend/                        # NestJS REST API
+│   ├── prisma/
+│   │   ├── schema.prisma           ← DB schema: User, Event, EventParticipant
+│   │   ├── migrations/             ← auto-generated SQL migrations
+│   │   └── seed.ts                 ← demo data (2 users, 3 events)
 │   └── src/
-│       ├── auth/           # JWT authentication
-│       ├── events/         # Events module
-│       ├── users/          # Users module
-│       └── prisma/         # Prisma service
-├── frontend/               # React + Vite SPA
+│       ├── auth/                   ← POST /auth/register, POST /auth/login
+│       │   ├── dto/auth.dto.ts     ← RegisterDto, LoginDto (class-validator)
+│       │   ├── auth.service.ts     ← bcrypt hashing, JWT signing
+│       │   ├── auth.controller.ts
+│       │   ├── jwt.strategy.ts     ← validates Bearer token on each request
+│       │   ├── jwt-auth.guard.ts   ← protects private endpoints
+│       │   └── optional-jwt-auth.guard.ts  ← passes user if token present
+│       ├── events/                 ← CRUD + join/leave
+│       │   ├── dto/event.dto.ts    ← CreateEventDto, UpdateEventDto
+│       │   ├── events.service.ts   ← business logic, Prisma queries
+│       │   └── events.controller.ts
+│       ├── users/                  ← GET /users/me, GET /users/me/events
+│       ├── prisma/                 ← PrismaService (global DB client)
+│       ├── app.module.ts
+│       └── main.ts                 ← Swagger /api/docs, ValidationPipe, CORS
+├── frontend/                       # React 18 + Vite SPA
 │   └── src/
-│       ├── components/     # Shared + calendar components
-│       ├── pages/          # Route-level pages
-│       └── store/          # Redux slices
-├── docker-compose.yml
+│       ├── api/axios.ts            ← Axios instance with JWT interceptor
+│       ├── store/
+│       │   ├── slices/authSlice.ts     ← login, register, fetchMe
+│       │   └── slices/eventsSlice.ts   ← events CRUD, join/leave
+│       ├── pages/
+│       │   ├── LoginPage           ← /login
+│       │   ├── RegisterPage        ← /register
+│       │   ├── EventsListPage      ← / (public events, upcoming only)
+│       │   ├── EventDetailsPage    ← /events/:id
+│       │   ├── CreateEventPage     ← /events/create
+│       │   ├── EditEventPage       ← /events/:id/edit
+│       │   └── MyEventsPage        ← /my-events (custom calendar)
+│       └── components/
+│           ├── calendar/           ← Month, Week, Day, Agenda, Year views
+│           ├── Navbar.tsx
+│           ├── EventCard.tsx
+│           ├── ProtectedRoute.tsx
+│           └── ConfirmModal.tsx
+├── docker-compose.yml              ← postgres + backend + frontend
 └── .env.example
+└── .env
 ```
