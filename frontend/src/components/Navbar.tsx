@@ -151,22 +151,23 @@ export default function Navbar() {
               </button>
             </>
           ) : (
-            <>
+            <div className="flex h-full w-full justify-center flex-col gap-4 mt-2">
               <Link
                 to="/login"
                 onClick={close}
-                className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition-colors"
+                className="flex w-50 items-center mx-auto justify-center gap-2 px-3 py-2.5 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition-colors"
               >
                 Login
               </Link>
+              <p className="text-center">or</p>
               <Link
                 to="/register"
                 onClick={close}
-                className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors"
+                className="flex w-50 items-center mx-auto justify-center gap-2 px-3 py-2.5 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors"
               >
                 Sign Up
               </Link>
-            </>
+            </div>
           )}
         </div>
       )}
