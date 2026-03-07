@@ -91,7 +91,7 @@ export default function CreateEventPage() {
               {...register("description")}
               placeholder="Describe what makes your event special..."
               rows={4}
-              className={inputClass + " resize-none"}
+              className={inputClass + " resize-y"}
             />
           </div>
 
