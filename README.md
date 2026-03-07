@@ -147,16 +147,17 @@ cd frontend && npm run dev
 
 ## Environment Variables
 
-| Variable            | Description                       | Default                 |
-| ------------------- | --------------------------------- | ----------------------- |
-| `POSTGRES_USER`     | PostgreSQL username               | `postgres`              |
-| `POSTGRES_PASSWORD` | PostgreSQL password               | `postgres`              |
-| `POSTGRES_DB`       | Database name                     | `event_management`      |
-| `DATABASE_URL`      | Full PostgreSQL connection string | —                       |
-| `JWT_SECRET`        | Secret key for signing JWT tokens | —                       |
-| `JWT_EXPIRES_IN`    | JWT token expiry                  | `7d`                    |
-| `PORT`              | Backend server port               | `3000`                  |
-| `VITE_API_URL`      | Backend URL used by the frontend  | `http://localhost:3000` |
+| Variable            | Description                                         | Default                 |
+| ------------------- | --------------------------------------------------- | ----------------------- |
+| `POSTGRES_USER`     | PostgreSQL username                                 | `postgres`              |
+| `POSTGRES_PASSWORD` | PostgreSQL password                                 | `postgres`              |
+| `POSTGRES_DB`       | Database name                                       | `event_management`      |
+| `DATABASE_URL`      | Full PostgreSQL connection string                   | —                       |
+| `JWT_SECRET`        | Secret key for signing JWT tokens                   | —                       |
+| `JWT_EXPIRES_IN`    | JWT token expiry                                    | `7d`                    |
+| `PORT`              | Backend server port                                 | `3000`                  |
+| `FRONTEND_URL`      | Frontend origin allowed by CORS (backend uses this) | `http://localhost:5173` |
+| `VITE_API_URL`      | Backend URL used by the frontend                    | `http://localhost:3000` |
 
 ---
 

@@ -147,16 +147,17 @@ cd frontend && npm run dev
 
 ## Змінні середовища
 
-| Змінна              | Опис                                   | За замовчуванням        |
-| ------------------- | -------------------------------------- | ----------------------- |
-| `POSTGRES_USER`     | Ім'я користувача PostgreSQL            | `postgres`              |
-| `POSTGRES_PASSWORD` | Пароль PostgreSQL                      | `postgres`              |
-| `POSTGRES_DB`       | Назва бази даних                       | `event_management`      |
-| `DATABASE_URL`      | Повний рядок підключення до PostgreSQL | —                       |
-| `JWT_SECRET`        | Секретний ключ для підпису JWT токенів | —                       |
-| `JWT_EXPIRES_IN`    | Час дії JWT токена                     | `7d`                    |
-| `PORT`              | Порт backend-сервера                   | `3000`                  |
-| `VITE_API_URL`      | URL backend для frontend               | `http://localhost:3000` |
+| Змінна              | Опис                                          | За замовчуванням        |
+| ------------------- | --------------------------------------------- | ----------------------- |
+| `POSTGRES_USER`     | Ім'я користувача PostgreSQL                   | `postgres`              |
+| `POSTGRES_PASSWORD` | Пароль PostgreSQL                             | `postgres`              |
+| `POSTGRES_DB`       | Назва бази даних                              | `event_management`      |
+| `DATABASE_URL`      | Повний рядок підключення до PostgreSQL        | —                       |
+| `JWT_SECRET`        | Секретний ключ для підпису JWT токенів        | —                       |
+| `JWT_EXPIRES_IN`    | Час дії JWT токена                            | `7d`                    |
+| `PORT`              | Порт backend-сервера                          | `3000`                  |
+| `FRONTEND_URL`      | URL фронтенду — backend використовує для CORS | `http://localhost:5173` |
+| `VITE_API_URL`      | URL backend для frontend                      | `http://localhost:3000` |
 
 ---
 
