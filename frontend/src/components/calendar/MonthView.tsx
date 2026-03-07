@@ -82,9 +82,11 @@ export default function MonthView({
                     className={`p-1.5 flex flex-col transition-colors ${
                       !isCurrentMonth
                         ? "bg-gray-50/60"
-                        : isSelected && !isToday
-                          ? "bg-indigo-50"
-                          : ""
+                        : isToday
+                          ? "bg-green-50"
+                          : isSelected
+                            ? "bg-indigo-50"
+                            : ""
                     }`}
                   >
                     <button

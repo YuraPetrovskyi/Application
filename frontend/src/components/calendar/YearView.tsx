@@ -21,6 +21,8 @@ export default function YearView({
     events.map((e) => dayjs(e.start).format("YYYY-MM-DD")),
   );
   const todayStr = dayjs().format("YYYY-MM-DD");
+  const currentMonthIndex = dayjs().month();
+  const currentYearNow = dayjs().year();
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -28,10 +30,12 @@ export default function YearView({
         const monthStart = dayjs(new Date(currentYear, m, 1));
         const daysInMonth = monthStart.daysInMonth();
         const offset = monthStart.day();
+        const isCurrentMonth =
+          m === currentMonthIndex && currentYear === currentYearNow;
         return (
           <div
             key={m}
-            className="bg-white rounded-xl border border-gray-200 p-3"
+            className={`rounded-xl border p-3 ${isCurrentMonth ? "bg-green-50 border-green-200" : "bg-white border-gray-200"}`}
           >
             <button
               onClick={() => {
