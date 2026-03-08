@@ -129,7 +129,7 @@ export default function MyEventsPage() {
       </div>
 
       {/* Navigation toolbar */}
-      <div className="mb-4 flex items-center justify-center sm:justify-between bg-white rounded-xl px-2 py-3 flex-wrap gap-4">
+      <div className="mb-4 flex items-center justify-center sm:justify-between rounded-xl px-2 py-3 flex-wrap gap-4">
         <div className="flex items-center gap-3">
           <button
             onClick={goBack}

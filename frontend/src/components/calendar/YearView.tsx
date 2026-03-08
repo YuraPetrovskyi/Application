@@ -35,7 +35,7 @@ export default function YearView({
         return (
           <div
             key={m}
-            className={`rounded-xl border p-3 ${isCurrentMonth ? "bg-green-50 border-green-200" : "bg-white border-gray-200"}`}
+            className={`rounded-xl border-2 p-3 ${isCurrentMonth ? "bg-green-50 border-green-300" : "bg-white border-gray-300"}`}
           >
             <button
               onClick={() => {
