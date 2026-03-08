@@ -17,12 +17,12 @@ export default function DayView({ events, currentDate, onSelectEvent }: Props) {
     .sort((a, b) => a.start.getTime() - b.start.getTime());
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-2xl border-2 border-gray-300 overflow-hidden">
       <div
-        className={`px-6 py-4 border-b border-gray-100 ${isToday ? "bg-indigo-50" : "bg-gray-50"}`}
+        className={`px-6 py-4 border-b-2 border-gray-300 ${isToday ? "bg-indigo-50" : "bg-gray-100"}`}
       >
         <p
-          className={`text-xs font-semibold uppercase tracking-widest mb-0.5 ${isToday ? "text-indigo-400" : "text-gray-400"}`}
+          className={`text-xs font-semibold uppercase tracking-widest mb-0.5 ${isToday ? "text-indigo-500" : "text-gray-500"}`}
         >
           {day.format("dddd")}
         </p>
@@ -38,7 +38,7 @@ export default function DayView({ events, currentDate, onSelectEvent }: Props) {
           <p className="text-gray-400">No events on this day.</p>
         </div>
       ) : (
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y-2 divide-gray-200">
           {dayEvents.map((e) => (
             <button
               key={e.id}
@@ -46,7 +46,7 @@ export default function DayView({ events, currentDate, onSelectEvent }: Props) {
               className="w-full text-left px-6 py-4 flex items-center gap-4 hover:bg-gray-200 transition-colors"
             >
               <div className="text-center shrink-0 w-14">
-                <p className="text-base font-bold text-gray-600">
+                <p className="text-base font-bold text-gray-500">
                   {dayjs(e.start).format("H:mm")}
                 </p>
               </div>

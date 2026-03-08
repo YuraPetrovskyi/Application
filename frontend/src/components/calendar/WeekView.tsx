@@ -24,19 +24,19 @@ export default function WeekView({
       .sort((a, b) => a.start.getTime() - b.start.getTime());
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-      <div className="grid grid-cols-7 divide-x divide-gray-200">
+    <div className="bg-white rounded-2xl border-2 border-gray-300 overflow-hidden">
+      <div className="grid grid-cols-7 divide-x-2 divide-gray-300">
         {weekDays.map((day) => {
           const isToday = day.format("YYYY-MM-DD") === todayStr;
           const dayEvents = getEventsForDay(day);
           return (
             <div key={day.toString()} className="min-h-[240px] flex flex-col">
               <div
-                className={`px-2 py-3 text-center border-b border-gray-200 ${
-                  isToday ? "bg-indigo-50" : "bg-gray-50"
+                className={`px-2 py-3 text-center border-b-2 border-gray-300 ${
+                  isToday ? "bg-indigo-100" : "bg-gray-100"
                 }`}
               >
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
                   {day.format("ddd")}
                 </p>
                 <p
@@ -50,7 +50,7 @@ export default function WeekView({
 
               <div className="flex-1 p-1.5 space-y-1 overflow-y-auto">
                 {dayEvents.length === 0 ? (
-                  <p className="text-xs text-gray-300 text-center mt-6">
+                  <p className="text-xs text-gray-400 text-center mt-6">
                     No Events
                   </p>
                 ) : (

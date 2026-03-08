@@ -41,13 +41,13 @@ export default function MonthView({
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-2xl border-2 border-gray-300 overflow-hidden">
       {/* Day-of-week headers */}
-      <div className="grid grid-cols-7 border-b border-gray-200">
+      <div className="grid grid-cols-7 border-b-2 border-gray-300">
         {DAY_HEADERS.map((d) => (
           <div
             key={d}
-            className="bg-gray-50 py-2.5 text-center text-[11px] font-semibold text-gray-400 uppercase tracking-wider"
+            className="bg-gray-100 py-2.5 text-center text-[11px] font-semibold text-gray-600 uppercase tracking-wider"
           >
             {d}
           </div>
@@ -55,7 +55,7 @@ export default function MonthView({
       </div>
 
       {/* Weeks */}
-      <div className="divide-y divide-gray-100">
+      <div className="divide-y-2 divide-gray-300">
         {weeks.map((week, wi) => {
           const hasCurrentMonth = week.some(
             (d) => d.month() === monthStart.month(),
@@ -65,7 +65,7 @@ export default function MonthView({
           return (
             <div
               key={wi}
-              className="grid grid-cols-7 divide-x divide-gray-100 min-h-[110px]"
+              className="grid grid-cols-7 divide-x-2 divide-gray-300 min-h-[110px]"
             >
               {week.map((day) => {
                 const isCurrentMonth = day.month() === monthStart.month();

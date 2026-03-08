@@ -80,7 +80,7 @@ export default function EventCard({ event }: Props) {
   return (
     <div
       onClick={() => navigate(`/events/${event.id}`)}
-      className="flex flex-col gap-3 justify-between rounded-xl border border-gray-200 p-5 hover:shadow-md hover:border-indigo-200 transition-all cursor-pointer"
+      className="flex flex-col gap-3 justify-between rounded-xl border border-gray-200 bg-white p-5 hover:shadow-lg hover:shadow-indigo-100 hover:border-indigo-300 hover:-translate-y-1 transition-all duration-200 cursor-pointer"
     >
       <div className="flex items-start justify-between gap-2">
         <h3 className="font-semibold text-gray-900 text-lg leading-tight line-clamp-1">
