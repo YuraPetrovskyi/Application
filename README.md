@@ -6,6 +6,10 @@
 
 A full-stack event management application where users can discover, create, and join events.
 
+🚀 **Live Demo:** [application-indol-ten.vercel.app](https://application-indol-ten.vercel.app)
+
+> Demo accounts: `alice@example.com` / `password123` or `bob@example.com` / `password123`
+
 ---
 
 ## Features

@@ -6,6 +6,10 @@
 
 Full-stack застосунок для управління подіями, де користувачі можуть знаходити, створювати та приєднуватись до подій.
 
+🚀 **Live Demo:** [application-indol-ten.vercel.app](https://application-indol-ten.vercel.app)
+
+> Демо акаунти: `alice@example.com` / `password123` або `bob@example.com` / `password123`
+
 ---
 
 ## Функціонал
