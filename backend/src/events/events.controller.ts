@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   UseGuards,
   Request,
   HttpCode,
@@ -15,6 +16,7 @@ import {
   ApiTags,
   ApiOperation,
   ApiResponse,
+  ApiQuery,
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { EventsService } from './events.service';
@@ -31,10 +33,24 @@ export class EventsController {
   @Get()
   @UseGuards(OptionalJwtAuthGuard)
   @ApiOperation({ summary: 'Get all public events' })
+  @ApiQuery({
+    name: 'tagIds',
+    required: false,
+    type: [String],
+    description: 'Filter by tag IDs',
+  })
   @ApiResponse({ status: 200, description: 'List of public events' })
-  async findAll(@Request() req: any) {
+  async findAll(
+    @Request() req: any,
+    @Query('tagIds') tagIds?: string | string[],
+  ) {
     const userId = req.user?.id;
-    return this.eventsService.findAll(userId);
+    const tagIdsArray = tagIds
+      ? Array.isArray(tagIds)
+        ? tagIds
+        : [tagIds]
+      : undefined;
+    return this.eventsService.findAll(userId, tagIdsArray);
   }
 
   @Get(':id')

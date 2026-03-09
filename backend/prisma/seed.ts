@@ -4,10 +4,32 @@ import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
+const PREDEFINED_TAGS = [
+  'Tech',
+  'Art',
+  'Business',
+  'Music',
+  'Science',
+  'Sport',
+  'Education',
+  'Health',
+];
+
 async function main() {
+  // Always upsert predefined tags
+  const tags: Record<string, string> = {};
+  for (const name of PREDEFINED_TAGS) {
+    const tag = await prisma.tag.upsert({
+      where: { name },
+      update: {},
+      create: { name },
+    });
+    tags[name] = tag.id;
+  }
+
   const userCount = await prisma.user.count();
   if (userCount > 0) {
-    console.log('Database already seeded, skipping...');
+    console.log('Database already seeded, skipping users/events...');
     return;
   }
 
@@ -15,6 +37,7 @@ async function main() {
 
   // Clean existing data
   await prisma.eventParticipant.deleteMany();
+  await prisma.eventTag.deleteMany();
   await prisma.event.deleteMany();
   await prisma.user.deleteMany();
 
@@ -48,6 +71,12 @@ async function main() {
       capacity: 150,
       visibility: 'PUBLIC',
       organizerId: alice.id,
+      tags: {
+        create: [
+          { tag: { connect: { id: tags['Tech'] } } },
+          { tag: { connect: { id: tags['Science'] } } },
+        ],
+      },
     },
   });
 
@@ -61,6 +90,12 @@ async function main() {
       capacity: 40,
       visibility: 'PUBLIC',
       organizerId: bob.id,
+      tags: {
+        create: [
+          { tag: { connect: { id: tags['Tech'] } } },
+          { tag: { connect: { id: tags['Education'] } } },
+        ],
+      },
     },
   });
 
@@ -74,6 +109,12 @@ async function main() {
       capacity: null,
       visibility: 'PUBLIC',
       organizerId: alice.id,
+      tags: {
+        create: [
+          { tag: { connect: { id: tags['Tech'] } } },
+          { tag: { connect: { id: tags['Business'] } } },
+        ],
+      },
     },
   });
 
@@ -87,8 +128,9 @@ async function main() {
   });
 
   console.log('✅ Seed completed!');
+  console.log(`   - 8 tags created: ${PREDEFINED_TAGS.join(', ')}`);
   console.log(`   - 2 users created (alice@example.com, bob@example.com)`);
-  console.log(`   - 3 public events created`);
+  console.log(`   - 3 public events created with tags`);
   console.log(`   - password for both users: password123`);
 }
 
