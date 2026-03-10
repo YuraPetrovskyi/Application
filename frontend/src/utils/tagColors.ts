@@ -93,14 +93,14 @@ const TAG_COLORS: Record<string, TagColor> = {
 };
 
 const DEFAULT_COLOR: TagColor = {
-  bg: "bg-indigo-50",
-  border: "border-indigo-200",
+  bg: "bg-indigo-200",
+  border: "border-indigo-400",
   text: "text-indigo-800",
-  hoverBg: "hover:bg-indigo-100",
-  dividerBg: "bg-indigo-200",
-  chipBg: "bg-indigo-50",
-  chipText: "text-indigo-600",
-  chipBorder: "border-indigo-100",
+  hoverBg: "hover:bg-indigo-300",
+  dividerBg: "bg-indigo-300",
+  chipBg: "bg-indigo-200",
+  chipText: "text-indigo-700",
+  chipBorder: "border-indigo-400",
 };
 
 export function getTagColor(tagName?: string): TagColor {

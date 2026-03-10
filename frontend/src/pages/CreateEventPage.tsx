@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
 import { createEvent } from "../store/slices/eventsSlice";
 import { fetchTags } from "../store/slices/tagsSlice";
+import TagSelector from "../components/TagSelector";
 import toast from "react-hot-toast";
 import { ArrowLeft } from "lucide-react";
 
@@ -27,16 +28,6 @@ export default function CreateEventPage() {
   useEffect(() => {
     if (tags.length === 0) dispatch(fetchTags());
   }, [dispatch, tags.length]);
-
-  const toggleTag = (id: string) => {
-    setSelectedTagIds((prev) =>
-      prev.includes(id)
-        ? prev.filter((t) => t !== id)
-        : prev.length < 5
-          ? [...prev, id]
-          : prev,
-    );
-  };
 
   const {
     register,
@@ -232,25 +223,11 @@ export default function CreateEventPage() {
                 (optional, max 5)
               </span>
             </label>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {tags.map((tag) => {
-                const selected = selectedTagIds.includes(tag.id);
-                return (
-                  <button
-                    key={tag.id}
-                    type="button"
-                    onClick={() => toggleTag(tag.id)}
-                    className={`px-3 py-1 rounded-lg text-sm font-medium border transition-colors ${
-                      selected
-                        ? "bg-indigo-400 text-white border-indigo-600"
-                        : "bg-white text-gray-600 border-gray-300 hover:border-indigo-400"
-                    }`}
-                  >
-                    {tag.name}
-                  </button>
-                );
-              })}
-            </div>
+            <TagSelector
+              tags={tags}
+              selectedIds={selectedTagIds}
+              onChange={setSelectedTagIds}
+            />
           </div>
 
           <div className="flex gap-3 pt-2">

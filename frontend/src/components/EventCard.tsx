@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
 import { joinEvent, leaveEvent } from "../store/slices/eventsSlice";
 import toast from "react-hot-toast";
 import { Calendar, MapPin, Users, Clock4 } from "lucide-react";
-import { getTagColor } from "../utils/tagColors";
+import TagChip from "../components/TagChip";
 
 interface Props {
   event: Event;
@@ -81,7 +81,7 @@ export default function EventCard({ event }: Props) {
   return (
     <div
       onClick={() => navigate(`/events/${event.id}`)}
-      className="flex flex-col gap-3 justify-between rounded-xl border border-gray-200 bg-white p-5 hover:shadow-lg hover:shadow-indigo-100 hover:border-indigo-300 hover:-translate-y-1 transition-all duration-200 cursor-pointer"
+      className="flex flex-col gap-3 justify-between rounded-xl border border-gray-300 bg-white p-5 hover:shadow-lg hover:shadow-indigo-100 hover:border-indigo-300 hover:-translate-y-1 transition-all duration-200 cursor-pointer"
     >
       <div className="flex items-start justify-between gap-2">
         <h3 className="font-semibold text-gray-900 text-lg leading-tight line-clamp-1">
@@ -117,17 +117,9 @@ export default function EventCard({ event }: Props) {
 
       {event.tags && event.tags.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
-          {event.tags.map((tag) => {
-            const color = getTagColor(tag.name);
-            return (
-              <span
-                key={tag.id}
-                className={`px-2 py-0.5 text-xs font-medium ${color.chipBg} ${color.chipText} rounded-lg border ${color.chipBorder}`}
-              >
-                {tag.name}
-              </span>
-            );
-          })}
+          {event.tags.map((tag) => (
+            <TagChip key={tag.id} tag={tag} />
+          ))}
         </div>
       )}
 

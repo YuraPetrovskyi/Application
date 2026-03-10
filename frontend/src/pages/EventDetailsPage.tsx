@@ -23,7 +23,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import { getTagColor } from "../utils/tagColors";
+import TagChip from "../components/TagChip";
 
 export default function EventDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -128,17 +128,9 @@ export default function EventDetailsPage() {
 
         {event.tags && event.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-6">
-            {event.tags.map((tag) => {
-              const color = getTagColor(tag.name);
-              return (
-                <span
-                  key={tag.id}
-                  className={`px-3 py-1 text-sm font-medium ${color.chipBg} ${color.chipText} rounded-lg border ${color.chipBorder}`}
-                >
-                  {tag.name}
-                </span>
-              );
-            })}
+            {event.tags.map((tag) => (
+              <TagChip key={tag.id} tag={tag} size="md" />
+            ))}
           </div>
         )}
 
