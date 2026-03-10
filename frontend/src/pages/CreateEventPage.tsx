@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
 import { createEvent } from "../store/slices/eventsSlice";
+import { fetchTags } from "../store/slices/tagsSlice";
 import toast from "react-hot-toast";
 import { ArrowLeft } from "lucide-react";
 
@@ -19,6 +21,22 @@ export default function CreateEventPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { loading } = useAppSelector((s) => s.events);
+  const { tags } = useAppSelector((s) => s.tags);
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (tags.length === 0) dispatch(fetchTags());
+  }, [dispatch, tags.length]);
+
+  const toggleTag = (id: string) => {
+    setSelectedTagIds((prev) =>
+      prev.includes(id)
+        ? prev.filter((t) => t !== id)
+        : prev.length < 5
+          ? [...prev, id]
+          : prev,
+    );
+  };
 
   const {
     register,
@@ -40,6 +58,7 @@ export default function CreateEventPage() {
         location: data.location,
         capacity: data.capacity ? Number(data.capacity) : undefined,
         visibility: data.visibility,
+        tagIds: selectedTagIds,
       };
       const event = await dispatch(createEvent(payload)).unwrap();
       toast.success("Event created!");
@@ -203,6 +222,34 @@ export default function CreateEventPage() {
                   Private - Only invited people can see this event
                 </span>
               </label>
+            </div>
+          </div>
+
+          <div>
+            <label className={labelClass}>
+              Tags{" "}
+              <span className="text-gray-400 font-normal">
+                (optional, max 5)
+              </span>
+            </label>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {tags.map((tag) => {
+                const selected = selectedTagIds.includes(tag.id);
+                return (
+                  <button
+                    key={tag.id}
+                    type="button"
+                    onClick={() => toggleTag(tag.id)}
+                    className={`px-3 py-1 rounded-lg text-sm font-medium border transition-colors ${
+                      selected
+                        ? "bg-indigo-400 text-white border-indigo-600"
+                        : "bg-white text-gray-600 border-gray-300 hover:border-indigo-400"
+                    }`}
+                  >
+                    {tag.name}
+                  </button>
+                );
+              })}
             </div>
           </div>
 

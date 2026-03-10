@@ -23,6 +23,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
+import { getTagColor } from "../utils/tagColors";
 
 export default function EventDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -124,6 +125,22 @@ export default function EventDetailsPage() {
         <p className="text-gray-600 leading-relaxed mb-6 text-lg font-medium break-words">
           {event.description}
         </p>
+
+        {event.tags && event.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-6">
+            {event.tags.map((tag) => {
+              const color = getTagColor(tag.name);
+              return (
+                <span
+                  key={tag.id}
+                  className={`px-3 py-1 text-sm font-medium ${color.chipBg} ${color.chipText} rounded-lg border ${color.chipBorder}`}
+                >
+                  {tag.name}
+                </span>
+              );
+            })}
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           <div className="bg-gray-50 rounded-xl p-4">

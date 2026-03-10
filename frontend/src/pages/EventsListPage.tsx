@@ -3,30 +3,47 @@ import dayjs from "dayjs";
 import { Search } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
 import { fetchEvents } from "../store/slices/eventsSlice";
+import { fetchTags } from "../store/slices/tagsSlice";
 import EventCard from "../components/EventCard";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { getTagColor } from "../utils/tagColors";
 
 export default function EventsListPage() {
   const dispatch = useAppDispatch();
   const { events, loading, error } = useAppSelector((s) => s.events);
+  const { tags } = useAppSelector((s) => s.tags);
   const [query, setQuery] = useState("");
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
   useEffect(() => {
     dispatch(fetchEvents());
+    if (tags.length === 0) dispatch(fetchTags());
   }, []);
+
+  const toggleTag = (id: string) => {
+    setSelectedTagIds((prev) =>
+      prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id],
+    );
+  };
 
   const todayStart = dayjs().startOf("day");
   const upcomingEvents = events.filter(
     (e) => !dayjs(e.dateTime).isBefore(todayStart),
   );
 
-  const filtered = query.trim()
-    ? upcomingEvents.filter((e) =>
-        [e.title, e.description, e.location].some((f) =>
-          f.toLowerCase().includes(query.toLowerCase()),
-        ),
-      )
-    : upcomingEvents;
+  const filtered = upcomingEvents.filter((e) => {
+    const matchesQuery =
+      !query.trim() ||
+      [e.title, e.description, e.location].some((f) =>
+        f.toLowerCase().includes(query.toLowerCase()),
+      );
+    const matchesTags =
+      selectedTagIds.length === 0 ||
+      selectedTagIds.some((tid) => e.tags?.some((t) => t.id === tid));
+    return matchesQuery && matchesTags;
+  });
+
+  const hasActiveFilters = query.trim() || selectedTagIds.length > 0;
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -37,7 +54,7 @@ export default function EventsListPage() {
         </p>
       </div>
 
-      <div className="relative mb-6 max-w-md">
+      <div className="relative mb-4 max-w-md">
         <Search
           size={16}
           className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -51,6 +68,36 @@ export default function EventsListPage() {
         />
       </div>
 
+      {tags.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-6">
+          {tags.map((tag) => {
+            const active = selectedTagIds.includes(tag.id);
+            const color = getTagColor(tag.name);
+            return (
+              <button
+                key={tag.id}
+                onClick={() => toggleTag(tag.id)}
+                className={`px-3 py-1 rounded-lg text-sm font-medium border transition-colors ${
+                  active
+                    ? `${color.chipBg} ${color.chipText} ${color.chipBorder}`
+                    : "bg-white text-gray-600 border-gray-300 hover:border-gray-400"
+                }`}
+              >
+                {tag.name}
+              </button>
+            );
+          })}
+          {selectedTagIds.length > 0 && (
+            <button
+              onClick={() => setSelectedTagIds([])}
+              className="px-3 py-1 text-sm text-gray-700 hover:text-red-500 transition-colors"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+      )}
+
       {loading && <LoadingSpinner />}
 
       {error && (
@@ -62,10 +109,14 @@ export default function EventsListPage() {
       {!loading && filtered.length === 0 && (
         <div className="text-center py-20 text-gray-400">
           <p className="text-xl">
-            {query ? "No events found" : "No events yet"}
+            {hasActiveFilters
+              ? "No events match the selected tags."
+              : "No events yet"}
           </p>
           <p className="mt-1">
-            {query ? "Try a different search" : "Be the first to create one!"}
+            {hasActiveFilters
+              ? "Try clearing the filters."
+              : "Be the first to create one!"}
           </p>
         </div>
       )}

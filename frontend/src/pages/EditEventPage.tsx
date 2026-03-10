@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
 import { fetchEvent, updateEvent } from "../store/slices/eventsSlice";
+import { fetchTags } from "../store/slices/tagsSlice";
 import LoadingSpinner from "../components/LoadingSpinner";
 import toast from "react-hot-toast";
 import { ArrowLeft } from "lucide-react";
@@ -23,6 +24,22 @@ export default function EditEventPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { currentEvent: event, loading } = useAppSelector((s) => s.events);
+  const { tags } = useAppSelector((s) => s.tags);
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (tags.length === 0) dispatch(fetchTags());
+  }, [dispatch, tags.length]);
+
+  const toggleTag = (tagId: string) => {
+    setSelectedTagIds((prev) =>
+      prev.includes(tagId)
+        ? prev.filter((t) => t !== tagId)
+        : prev.length < 5
+          ? [...prev, tagId]
+          : prev,
+    );
+  };
 
   const {
     register,
@@ -48,6 +65,7 @@ export default function EditEventPage() {
         capacity: event.capacity?.toString() || "",
         visibility: event.visibility,
       });
+      setSelectedTagIds(event.tags?.map((t) => t.id) ?? []);
     }
   }, [event]);
 
@@ -60,6 +78,7 @@ export default function EditEventPage() {
         location: data.location,
         capacity: data.capacity !== "" ? Number(data.capacity) : null,
         visibility: data.visibility,
+        tagIds: selectedTagIds,
       };
       await dispatch(updateEvent({ id: id!, data: payload })).unwrap();
       toast.success("Event updated!");
@@ -222,6 +241,34 @@ export default function EditEventPage() {
                   Private - Only invited people can see this event
                 </span>
               </label>
+            </div>
+          </div>
+
+          <div>
+            <label className={labelClass}>
+              Tags{" "}
+              <span className="text-gray-400 font-normal">
+                (optional, max 5)
+              </span>
+            </label>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {tags.map((tag) => {
+                const selected = selectedTagIds.includes(tag.id);
+                return (
+                  <button
+                    key={tag.id}
+                    type="button"
+                    onClick={() => toggleTag(tag.id)}
+                    className={`px-3 py-1 rounded-lg text-sm font-medium border transition-colors ${
+                      selected
+                        ? "bg-indigo-400 text-white border-indigo-600"
+                        : "bg-white text-gray-600 border-gray-300 hover:border-indigo-400"
+                    }`}
+                  >
+                    {tag.name}
+                  </button>
+                );
+              })}
             </div>
           </div>
 

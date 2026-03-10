@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
 import { joinEvent, leaveEvent } from "../store/slices/eventsSlice";
 import toast from "react-hot-toast";
 import { Calendar, MapPin, Users, Clock4 } from "lucide-react";
+import { getTagColor } from "../utils/tagColors";
 
 interface Props {
   event: Event;
@@ -113,6 +114,22 @@ export default function EventCard({ event }: Props) {
       </div>
 
       <div className="h-[1px] bg-gray-200"></div>
+
+      {event.tags && event.tags.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {event.tags.map((tag) => {
+            const color = getTagColor(tag.name);
+            return (
+              <span
+                key={tag.id}
+                className={`px-2 py-0.5 text-xs font-medium ${color.chipBg} ${color.chipText} rounded-lg border ${color.chipBorder}`}
+              >
+                {tag.name}
+              </span>
+            );
+          })}
+        </div>
+      )}
 
       <div>{renderAction()}</div>
     </div>

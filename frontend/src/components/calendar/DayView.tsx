@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import type { CalendarEvent } from "./types";
+import { getTagColor } from "../../utils/tagColors";
 
 interface Props {
   events: CalendarEvent[];
@@ -39,23 +40,28 @@ export default function DayView({ events, currentDate, onSelectEvent }: Props) {
         </div>
       ) : (
         <div className="divide-y-2 divide-gray-200">
-          {dayEvents.map((e) => (
-            <button
-              key={e.id}
-              onClick={() => onSelectEvent(e)}
-              className="w-full text-left px-6 py-4 flex items-center gap-4 hover:bg-gray-200 transition-colors"
-            >
-              <div className="text-center shrink-0 w-14">
-                <p className="text-base font-bold text-gray-500">
-                  {dayjs(e.start).format("H:mm")}
+          {dayEvents.map((e) => {
+            const color = getTagColor(e.resource.tags?.[0]?.name);
+            return (
+              <button
+                key={e.id}
+                onClick={() => onSelectEvent(e)}
+                className="w-full text-left px-6 py-4 flex items-center gap-4 hover:bg-gray-50 transition-colors"
+              >
+                <div className="text-center shrink-0 w-14">
+                  <p className="text-base font-bold text-gray-500">
+                    {dayjs(e.start).format("H:mm")}
+                  </p>
+                </div>
+                <div
+                  className={`w-0.5 h-9 ${color.dividerBg} rounded-full shrink-0`}
+                />
+                <p className="flex-1 text-sm font-semibold text-gray-700 truncate">
+                  {e.title}
                 </p>
-              </div>
-              <div className="w-0.5 h-9 bg-indigo-200 rounded-full shrink-0" />
-              <p className="flex-1 text-sm font-semibold text-gray-700 truncate">
-                {e.title}
-              </p>
-            </button>
-          ))}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
