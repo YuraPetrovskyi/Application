@@ -8,8 +8,7 @@ import {
   User,
   X,
 } from "lucide-react";
-import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
-import { closeAssistant } from "../store/slices/uiSlice";
+import { useUIStore } from "../store/useUIStore";
 import api from "../api/axios";
 
 interface Message {
@@ -27,8 +26,8 @@ const SUGGESTIONS = [
 ];
 
 export default function AssistantDrawer() {
-  const dispatch = useAppDispatch();
-  const isOpen = useAppSelector((s) => s.ui.assistantOpen);
+  const isOpen = useUIStore((s) => s.assistantOpen);
+  const closeAssistant = useUIStore((s) => s.closeAssistant);
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [question, setQuestion] = useState("");
@@ -52,7 +51,7 @@ export default function AssistantDrawer() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  const close = () => dispatch(closeAssistant());
+  const close = () => closeAssistant();
 
   const ask = async (q: string) => {
     const trimmed = q.trim();

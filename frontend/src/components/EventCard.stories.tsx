@@ -7,7 +7,6 @@ import type { Event } from "../types";
 import authReducer from "../store/slices/authSlice";
 import eventsReducer from "../store/slices/eventsSlice";
 import tagsReducer from "../store/slices/tagsSlice";
-import uiReducer from "../store/slices/uiSlice";
 
 /** Minimal Redux store so EventCard's dispatch/selector calls don't crash. */
 function makeStore(userId: string | null = "user-1") {
@@ -16,7 +15,6 @@ function makeStore(userId: string | null = "user-1") {
       auth: authReducer,
       events: eventsReducer,
       tags: tagsReducer,
-      ui: uiReducer,
     },
     preloadedState: {
       auth: {
