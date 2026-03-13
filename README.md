@@ -194,11 +194,11 @@ cd frontend && npm run dev
 
 ### Tags
 
-| Method | Endpoint    | Auth | Description      |
-| ------ | ----------- | ---- | ---------------- |
-| GET    | `/tags`     | No   | Get all tags     |
-| POST   | `/tags`     | Yes  | Create a new tag |
-| DELETE | `/tags/:id` | Yes  | Delete a tag     |
+| Method | Endpoint | Auth | Description                                    |
+| ------ | -------- | ---- | ---------------------------------------------- |
+| GET    | `/tags`  | No   | Get all available tags (pre-seeded in the DB)  |
+
+> Tags are managed via the database seed (`prisma/seed.ts`). The predefined set includes: Tech, Art, Business, Music, Science, Sport, Education, Health.
 
 ### AI Assistant
 
