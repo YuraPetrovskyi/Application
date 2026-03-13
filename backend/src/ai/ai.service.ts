@@ -113,8 +113,8 @@ ${context}`,
       const tags = e.tags?.map((et: any) => et.tag.name).join(', ') || 'none';
       const joined = e._count?.participants ?? 0;
       const capacity = e.capacity
-        ? `${joined}/${e.capacity} participants`
-        : `${joined} participants (unlimited)`;
+        ? `${joined} joined (capacity: ${e.capacity})`
+        : `${joined} joined (capacity: unlimited)`;
       return `- "${e.title}" | ${fmt(e.dateTime)} | ${e.location} | tags: ${tags} | ${capacity}`;
     };
 
@@ -122,8 +122,8 @@ ${context}`,
       const tags = e.tags?.map((et: any) => et.tag.name).join(', ') || 'none';
       const joined = e._count?.participants ?? 0;
       const capacity = e.capacity
-        ? `${joined}/${e.capacity} participants`
-        : `${joined} participants (unlimited)`;
+        ? `${joined} joined (capacity: ${e.capacity})`
+        : `${joined} joined (capacity: unlimited)`;
       return `- "${e.title}" | ${fmt(e.dateTime)} | ${e.location} | tags: ${tags} | ${capacity} | organizer: ${e.organizer.name}`;
     };
 

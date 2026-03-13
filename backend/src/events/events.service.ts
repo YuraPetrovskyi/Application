@@ -13,26 +13,40 @@ import { Visibility } from '@prisma/client';
 export class EventsService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(userId?: string, tagIds?: string[]) {
-    const events = await this.prisma.event.findMany({
-      where: {
-        visibility: Visibility.PUBLIC,
-        ...(tagIds?.length && {
-          tags: { some: { tagId: { in: tagIds } } },
-        }),
-      },
-      include: {
-        organizer: { select: { id: true, name: true, email: true } },
-        participants: {
-          include: { user: { select: { id: true, name: true } } },
-        },
-        tags: { include: { tag: true } },
-        _count: { select: { participants: true } },
-      },
-      orderBy: { dateTime: 'asc' },
-    });
+  async findAll(userId?: string, tagIds?: string[], page = 1, limit = 12) {
+    const skip = (page - 1) * limit;
+    const where = {
+      visibility: Visibility.PUBLIC,
+      dateTime: { gte: new Date() },
+      ...(tagIds?.length && {
+        tags: { some: { tagId: { in: tagIds } } },
+      }),
+    };
 
-    return events.map((event) => this.formatEvent(event, userId));
+    const [events, total] = await Promise.all([
+      this.prisma.event.findMany({
+        where,
+        include: {
+          organizer: { select: { id: true, name: true, email: true } },
+          participants: {
+            include: { user: { select: { id: true, name: true } } },
+          },
+          tags: { include: { tag: true } },
+          _count: { select: { participants: true } },
+        },
+        orderBy: { dateTime: 'asc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.event.count({ where }),
+    ]);
+
+    return {
+      data: events.map((event) => this.formatEvent(event, userId)),
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async findOne(id: string, userId?: string) {
