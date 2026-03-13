@@ -3,12 +3,19 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import api from "../../api/axios";
 import type { Event } from "../../types";
 
+interface Pagination {
+  total: number;
+  page: number;
+  totalPages: number;
+}
+
 interface EventsState {
   events: Event[];
   myEvents: Event[];
   currentEvent: Event | null;
   loading: boolean;
   error: string | null;
+  pagination: Pagination | null;
 }
 
 const initialState: EventsState = {
@@ -17,13 +24,34 @@ const initialState: EventsState = {
   currentEvent: null,
   loading: false,
   error: null,
+  pagination: null,
 };
+
+interface FetchEventsParams {
+  page?: number;
+  limit?: number;
+  tagIds?: string[];
+}
+
+interface PaginatedEventsResponse {
+  data: Event[];
+  total: number;
+  page: number;
+  totalPages: number;
+}
 
 export const fetchEvents = createAsyncThunk(
   "events/fetchAll",
-  async (_, { rejectWithValue }) => {
+  async (params: FetchEventsParams = {}, { rejectWithValue }) => {
     try {
-      const res = await api.get<Event[]>("/events");
+      const { page = 1, limit = 12, tagIds = [] } = params;
+      const searchParams = new URLSearchParams();
+      searchParams.set("page", String(page));
+      searchParams.set("limit", String(limit));
+      tagIds.forEach((id) => searchParams.append("tagIds", id));
+      const res = await api.get<PaginatedEventsResponse>(
+        `/events?${searchParams.toString()}`,
+      );
       return res.data;
     } catch (err: any) {
       return rejectWithValue(
@@ -148,13 +176,15 @@ const eventsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(
-        fetchEvents.fulfilled,
-        (state, action: PayloadAction<Event[]>) => {
-          state.loading = false;
-          state.events = action.payload;
-        },
-      )
+      .addCase(fetchEvents.fulfilled, (state, action) => {
+        state.loading = false;
+        state.events = action.payload.data;
+        state.pagination = {
+          total: action.payload.total,
+          page: action.payload.page,
+          totalPages: action.payload.totalPages,
+        };
+      })
       .addCase(fetchEvents.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;

@@ -1,47 +1,55 @@
 import { useEffect, useState } from "react";
-import dayjs from "dayjs";
+import { useSearchParams } from "react-router-dom";
 import { Search } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
 import { fetchEvents } from "../store/slices/eventsSlice";
 import { fetchTags } from "../store/slices/tagsSlice";
 import EventCard from "../components/EventCard";
 import LoadingSpinner from "../components/LoadingSpinner";
+import Pagination from "../components/Pagination";
 import { getTagColor } from "../utils/tagColors";
 
 export default function EventsListPage() {
   const dispatch = useAppDispatch();
-  const { events, loading, error } = useAppSelector((s) => s.events);
+  const { events, loading, error, pagination } = useAppSelector(
+    (s) => s.events,
+  );
   const { tags } = useAppSelector((s) => s.tags);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = parseInt(searchParams.get("page") ?? "1", 10);
+  const setPage = (p: number) =>
+    setSearchParams((prev) => { prev.set("page", String(p)); return prev; }, { replace: true });
   const [query, setQuery] = useState("");
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
   useEffect(() => {
-    dispatch(fetchEvents());
     if (tags.length === 0) dispatch(fetchTags());
   }, []);
 
-  const toggleTag = (id: string) => {
+  useEffect(() => {
+    dispatch(fetchEvents({ page, tagIds: selectedTagIds }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, selectedTagIds]);
+
+  const handleTagToggle = (id: string) => {
+    setPage(1);
     setSelectedTagIds((prev) =>
       prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id],
     );
   };
 
-  const todayStart = dayjs().startOf("day");
-  const upcomingEvents = events.filter(
-    (e) => !dayjs(e.dateTime).isBefore(todayStart),
-  );
+  const handleClearTags = () => {
+    setPage(1);
+    setSelectedTagIds([]);
+  };
 
-  const filtered = upcomingEvents.filter((e) => {
-    const matchesQuery =
-      !query.trim() ||
-      [e.title, e.description, e.location].some((f) =>
-        f.toLowerCase().includes(query.toLowerCase()),
-      );
-    const matchesTags =
-      selectedTagIds.length === 0 ||
-      selectedTagIds.some((tid) => e.tags?.some((t) => t.id === tid));
-    return matchesQuery && matchesTags;
-  });
+  const filtered = query.trim()
+    ? events.filter((e) =>
+        [e.title, e.description, e.location].some((f) =>
+          f.toLowerCase().includes(query.toLowerCase()),
+        ),
+      )
+    : events;
 
   const hasActiveFilters = query.trim() || selectedTagIds.length > 0;
 
@@ -76,7 +84,7 @@ export default function EventsListPage() {
             return (
               <button
                 key={tag.id}
-                onClick={() => toggleTag(tag.id)}
+                onClick={() => handleTagToggle(tag.id)}
                 className={`px-3 py-1 rounded-lg text-sm font-medium border transition-colors ${
                   active
                     ? `${color.chipBg} ${color.chipText} ${color.chipBorder}`
@@ -89,7 +97,7 @@ export default function EventsListPage() {
           })}
           {selectedTagIds.length > 0 && (
             <button
-              onClick={() => setSelectedTagIds([])}
+              onClick={handleClearTags}
               className="px-3 py-1 text-sm text-gray-700 hover:text-red-500 transition-colors"
             >
               Clear
@@ -126,6 +134,20 @@ export default function EventsListPage() {
           <EventCard key={event.id} event={event} />
         ))}
       </div>
+
+      {!query.trim() && pagination && pagination.totalPages > 1 && (
+        <div className="mt-10">
+          <Pagination
+            page={page}
+            totalPages={pagination.totalPages}
+            onPageChange={setPage}
+          />
+          <p className="text-center text-xs text-gray-400 mt-3">
+            {pagination.total} events total · page {pagination.page} of{" "}
+            {pagination.totalPages}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
