@@ -15,11 +15,13 @@ A full-stack event management application where users can discover, create, and 
 ## Features
 
 - **Authentication** — Register and log in with JWT-based auth
+- **Security** — HTTP security headers (helmet), rate limiting on auth and AI endpoints
 - **Events** — Create, edit, delete events with title, description, date, location, capacity and visibility
 - **Tags** — Attach color-coded tags to events; filter and search by tag
 - **Discover** — Browse all upcoming public events (past events filtered out)
 - **My Events** — View events you've created or joined in a custom calendar (Month / Week / Day / Agenda / Year views)
 - **Join / Leave** — Join or leave any public event
+- **Pagination** — Configurable events per page (6 / 12 / 24), URL-synced page number, preferences persisted in localStorage
 - **AI Assistant** — Chat with an AI assistant (Groq llama-3.3-70b) about your events and public events
 - **Seed data** — On first run, the database is automatically populated with demo users and events
 
@@ -27,13 +29,13 @@ A full-stack event management application where users can discover, create, and 
 
 ## Tech Stack
 
-| Layer     | Technology                                                                  |
-| --------- | --------------------------------------------------------------------------- |
-| Frontend  | React 18, TypeScript, Vite, Tailwind CSS v4, Redux Toolkit, Zustand         |
-| Backend   | NestJS, TypeScript, Prisma ORM, Passport JWT, Groq SDK                      |
-| Database  | PostgreSQL 16                                                               |
-| DevOps    | Docker, docker-compose                                                      |
-| Storybook | Component documentation and visual testing                                  |
+| Layer     | Technology                                                          |
+| --------- | ------------------------------------------------------------------- |
+| Frontend  | React 18, TypeScript, Vite, Tailwind CSS v4, Redux Toolkit, Zustand |
+| Backend   | NestJS, TypeScript, Prisma ORM, Passport JWT, Groq SDK              |
+| Database  | PostgreSQL 16                                                       |
+| DevOps    | Docker, docker-compose                                              |
+| Storybook | Component documentation and visual testing                          |
 
 ---
 
@@ -192,17 +194,17 @@ cd frontend && npm run dev
 
 ### Tags
 
-| Method | Endpoint     | Auth | Description        |
-| ------ | ------------ | ---- | ------------------ |
-| GET    | `/tags`      | No   | Get all tags       |
-| POST   | `/tags`      | Yes  | Create a new tag   |
-| DELETE | `/tags/:id`  | Yes  | Delete a tag       |
+| Method | Endpoint    | Auth | Description      |
+| ------ | ----------- | ---- | ---------------- |
+| GET    | `/tags`     | No   | Get all tags     |
+| POST   | `/tags`     | Yes  | Create a new tag |
+| DELETE | `/tags/:id` | Yes  | Delete a tag     |
 
 ### AI Assistant
 
-| Method | Endpoint   | Auth | Description                                         |
-| ------ | ---------- | ---- | --------------------------------------------------- |
-| POST   | `/ai/ask`  | Yes  | Ask a question about your events (Groq LLM backend) |
+| Method | Endpoint  | Auth | Description                                         |
+| ------ | --------- | ---- | --------------------------------------------------- |
+| POST   | `/ai/ask` | Yes  | Ask a question about your events (Groq LLM backend) |
 
 ---
 
@@ -214,7 +216,7 @@ Application/
 │   ├── prisma/
 │   │   ├── schema.prisma           ← DB schema: User, Event, EventParticipant
 │   │   ├── migrations/             ← auto-generated SQL migrations
-│   │   └── seed.ts                 ← demo data (2 users, 3 events)
+│   │   └── seed.ts                 ← demo data (2 users, 50 events)
 │   └── src/
 │       ├── auth/                   ← POST /auth/register, POST /auth/login
 │       │   ├── dto/auth.dto.ts     ← RegisterDto, LoginDto (class-validator)
@@ -246,7 +248,7 @@ Application/
 │       │   ├── slices/authSlice.ts     ← login, register, fetchMe (Redux)
 │       │   ├── slices/eventsSlice.ts   ← events CRUD, join/leave (Redux)
 │       │   ├── slices/tagsSlice.ts     ← tags list (Redux)
-│       │   └── useUIStore.ts           ← assistant open/close (Zustand)
+│       │   └── useUIStore.ts           ← UI preferences: per-page, calendar, assistant (Zustand + persist)
 │       ├── pages/
 │       │   ├── LoginPage           ← /login
 │       │   ├── RegisterPage        ← /register
@@ -256,16 +258,26 @@ Application/
 │       │   ├── EditEventPage       ← /events/:id/edit
 │       │   └── MyEventsPage        ← /my-events (custom calendar)
 │       └── components/
-│           ├── calendar/           ← Month, Week, Day, Agenda, Year views
-│           ├── Navbar.tsx
-│           ├── EventCard.tsx       ← EventCard.stories.tsx
-│           ├── TagChip.tsx         ← TagChip.stories.tsx
-│           ├── TagSelector.tsx     ← TagSelector.stories.tsx
-│           ├── ConfirmModal.tsx    ← ConfirmModal.stories.tsx
-│           ├── LoadingSpinner.tsx  ← LoadingSpinner.stories.tsx
-│           ├── AssistantDrawer.tsx ← AI chat drawer (Zustand state)
-│           ├── AIAssistantFAB.tsx  ← floating action button (logged-in only)
-│           └── ProtectedRoute.tsx
+│           ├── ai/                     ← AI drawer + floating action button
+│           │   ├── AssistantDrawer.tsx   ← AI chat drawer (Zustand state)
+│           │   └── AIAssistantFAB.tsx    ← floating action button (logged-in only)
+│           ├── calendar/               ← Month, Week, Day, Agenda, Year views
+│           ├── events/                 ← event-level UI components
+│           │   ├── EventCard.tsx           ← EventCard.stories.tsx
+│           │   ├── TagChip.tsx             ← TagChip.stories.tsx
+│           │   ├── TagSelector.tsx         ← TagSelector.stories.tsx
+│           │   └── ConfirmModal.tsx
+│           ├── layout/                 ← app shell
+│           │   ├── Navbar.tsx
+│           │   └── ProtectedRoute.tsx
+│           ├── pagination/             ← pagination controls
+│           │   ├── Pagination.tsx          ← Pagination.stories.tsx
+│           │   └── PerPageSelector.tsx     ← PerPageSelector.stories.tsx
+│           └── ui/                     ← generic reusable components
+│               ├── Button.tsx              ← Button.stories.tsx
+│               ├── Input.tsx               ← Input.stories.tsx
+│               ├── BackButton.tsx          ← BackButton.stories.tsx
+│               └── LoadingSpinner.tsx      ← LoadingSpinner.stories.tsx
 ├── docker-compose.yml              ← postgres + backend + frontend
 └── .env.example
 ```

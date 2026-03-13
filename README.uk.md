@@ -15,11 +15,13 @@ Full-stack застосунок для управління подіями, де
 ## Функціонал
 
 - **Автентифікація** — Реєстрація та вхід з JWT-авторизацією
+- **Безпека** — HTTP заголовки безпеки (helmet), обмеження запитів на auth та AI endpoints
 - **Події** — Створення, редагування, видалення подій із назвою, описом, датою, локацією, місткістю та видимістю
 - **Теги** — Додавання кольорових тегів до подій; фільтрація та пошук за тегом
 - **Огляд** — Перегляд усіх майбутніх публічних подій (минулі події відфільтровані)
 - **Мої події** — Перегляд подій, які ти створив або відвідуєш, у кастомному календарі (вигляди: Місяць / Тиждень / День / Порядок / Рік)
 - **Приєднатись / Вийти** — Приєднатись або покинути будь-яку публічну подію
+- **Пагінація** — Налаштовувана кількість подій на сторінці (6 / 12 / 24), номер сторінки в URL, налаштування збережені в localStorage
 - **AI Асистент** — Чат з AI асистентом (Groq llama-3.3-70b) про твої події та публічні події
 - **Seed-дані** — При першому запуску база даних автоматично заповнюється демонстраційними користувачами та подіями
 
@@ -214,7 +216,7 @@ Application/
 │   ├── prisma/
 │   │   ├── schema.prisma           ← схема БД: User, Event, EventParticipant
 │   │   ├── migrations/             ← SQL міграції
-│   │   └── seed.ts                 ← демо-дані (2 користувачі, 3 події)
+│   │   └── seed.ts                 ← демо-дані (2 користувачі, 50 подій)
 │   └── src/
 │       ├── auth/                   ← POST /auth/register, POST /auth/login
 │       │   ├── dto/auth.dto.ts     ← RegisterDto, LoginDto (class-validator)
@@ -246,7 +248,7 @@ Application/
 │       │   ├── slices/authSlice.ts     ← login, register, fetchMe (Redux)
 │       │   ├── slices/eventsSlice.ts   ← CRUD подій, join/leave (Redux)
 │       │   ├── slices/tagsSlice.ts     ← список тегів (Redux)
-│       │   └── useUIStore.ts           ← відкриття/закриття асистента (Zustand)
+│       │   └── useUIStore.ts           ← налаштування UI: сторінки, календар, асистент (Zustand + persist)
 │       ├── pages/
 │       │   ├── LoginPage           ← /login
 │       │   ├── RegisterPage        ← /register
@@ -256,16 +258,26 @@ Application/
 │       │   ├── EditEventPage       ← /events/:id/edit
 │       │   └── MyEventsPage        ← /my-events (кастомний календар)
 │       └── components/
-│           ├── calendar/           ← вигляди: Місяць, Тиждень, День, Порядок, Рік
-│           ├── Navbar.tsx
-│           ├── EventCard.tsx       ← EventCard.stories.tsx
-│           ├── TagChip.tsx         ← TagChip.stories.tsx
-│           ├── TagSelector.tsx     ← TagSelector.stories.tsx
-│           ├── ConfirmModal.tsx    ← ConfirmModal.stories.tsx
-│           ├── LoadingSpinner.tsx  ← LoadingSpinner.stories.tsx
-│           ├── AssistantDrawer.tsx ← AI чат-дровер (стан Zustand)
-│           ├── AIAssistantFAB.tsx  ← плаваюча кнопка (тільки для залогінених)
-│           └── ProtectedRoute.tsx
+│           ├── ai/                     ← AI дровер + плаваюча кнопка
+│           │   ├── AssistantDrawer.tsx   ← AI чат-дровер (стан Zustand)
+│           │   └── AIAssistantFAB.tsx    ← плаваюча кнопка (тільки для залогінених)
+│           ├── calendar/               ← вигляди: Місяць, Тиждень, День, Порядок, Рік
+│           ├── events/                 ← компоненти рівня події
+│           │   ├── EventCard.tsx           ← EventCard.stories.tsx
+│           │   ├── TagChip.tsx             ← TagChip.stories.tsx
+│           │   ├── TagSelector.tsx         ← TagSelector.stories.tsx
+│           │   └── ConfirmModal.tsx
+│           ├── layout/                 ← оболонка застосунку
+│           │   ├── Navbar.tsx
+│           │   └── ProtectedRoute.tsx
+│           ├── pagination/             ← елементи пагінації
+│           │   ├── Pagination.tsx          ← Pagination.stories.tsx
+│           │   └── PerPageSelector.tsx     ← PerPageSelector.stories.tsx
+│           └── ui/                     ← загальні компоненти
+│               ├── Button.tsx              ← Button.stories.tsx
+│               ├── Input.tsx               ← Input.stories.tsx
+│               ├── BackButton.tsx          ← BackButton.stories.tsx
+│               └── LoadingSpinner.tsx      ← LoadingSpinner.stories.tsx
 ├── docker-compose.yml              ← postgres + backend + frontend
 └── .env.example
 ```
