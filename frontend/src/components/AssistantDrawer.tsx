@@ -19,10 +19,11 @@ interface Message {
 }
 
 const SUGGESTIONS = [
-  "What events do I have coming up?",
-  "Do I have any events this month?",
-  "Which of my events have the most participants?",
-  "Summarize my organized events.",
+  "What events am I attending this week?",
+  "When is my next event?",
+  "List all events I organize.",
+  "Show public tech events this weekend.",
+  "Which events have the most participants?",
 ];
 
 export default function AssistantDrawer() {
