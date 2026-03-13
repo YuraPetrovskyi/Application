@@ -5,8 +5,8 @@ import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
 import { createEvent } from "../store/slices/eventsSlice";
 import { fetchTags } from "../store/slices/tagsSlice";
 import TagSelector from "../components/TagSelector";
+import BackButton from "../components/BackButton";
 import toast from "react-hot-toast";
-import { ArrowLeft } from "lucide-react";
 
 interface FormData {
   title: string;
@@ -65,15 +65,9 @@ export default function CreateEventPage() {
   const errorClass = "text-red-500 text-xs mt-1";
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
-      <button
-        onClick={() => navigate(-1)}
-        className="flex items-center gap-1.5 text-gray-500 hover:text-indigo-600 mb-6 text-sm transition-colors"
-      >
-        <ArrowLeft size={16} />
-        Back
-      </button>
-      <div className="bg-white rounded-2xl border border-gray-200 p-8">
+    <div className="max-w-2xl mx-auto px-4 py-4">
+      <BackButton />
+      <div className="bg-white rounded-2xl border border-gray-200 p-8 mt-4">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Create New Event</h1>
           <p className="text-gray-500 mt-1">

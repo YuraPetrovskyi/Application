@@ -10,9 +10,9 @@ import {
 } from "../store/slices/eventsSlice";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ConfirmModal from "../components/ConfirmModal";
+import BackButton from "../components/BackButton";
 import toast from "react-hot-toast";
 import {
-  ArrowLeft,
   CalendarDays,
   MapPin,
   Users,
@@ -74,7 +74,7 @@ export default function EventDetailsPage() {
   if (loading || !event) return <LoadingSpinner />;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
+    <div className="max-w-3xl mx-auto px-4 py-4">
       {showConfirm && (
         <ConfirmModal
           message="Are you sure you want to delete this event?"
@@ -83,15 +83,9 @@ export default function EventDetailsPage() {
         />
       )}
 
-      <button
-        onClick={() => navigate(-1)}
-        className="text-gray-500 hover:text-indigo-600 mb-6 flex items-center gap-1.5 text-sm"
-      >
-        <ArrowLeft size={16} />
-        Back
-      </button>
+      <BackButton />
 
-      <div className="bg-white rounded-2xl border border-gray-200 p-8">
+      <div className="bg-white rounded-2xl border border-gray-200 p-8 mt-4">
         <div className="flex flex-wrap items-start justify-between gap-2 mb-6 ">
           <div>
             <span className="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded-lg font-medium">
