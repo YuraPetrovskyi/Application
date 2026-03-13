@@ -58,6 +58,7 @@ export default function LoginPage() {
               <input
                 {...register("email", { required: "Email is required" })}
                 type="email"
+                autoComplete="email"
                 placeholder="you@example.com"
                 className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               />
@@ -75,6 +76,7 @@ export default function LoginPage() {
               <input
                 {...register("password", { required: "Password is required" })}
                 type="password"
+                autoComplete="current-password"
                 placeholder="••••••••"
                 className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               />

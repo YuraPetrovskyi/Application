@@ -58,6 +58,8 @@ export default function RegisterPage() {
               </label>
               <input
                 {...register("name", { required: "Name is required" })}
+                type="text"
+                autoComplete="name"
                 placeholder="John Doe"
                 className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               />
@@ -75,6 +77,7 @@ export default function RegisterPage() {
               <input
                 {...register("email", { required: "Email is required" })}
                 type="email"
+                autoComplete="email"
                 placeholder="you@example.com"
                 className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               />
@@ -95,6 +98,7 @@ export default function RegisterPage() {
                   minLength: { value: 6, message: "Min 6 characters" },
                 })}
                 type="password"
+                autoComplete="new-password"
                 placeholder="••••••••"
                 className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               />
