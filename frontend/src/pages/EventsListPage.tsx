@@ -7,6 +7,7 @@ import { fetchTags } from "../store/slices/tagsSlice";
 import EventCard from "../components/EventCard";
 import LoadingSpinner from "../components/LoadingSpinner";
 import Pagination from "../components/Pagination";
+import PerPageSelector from "../components/PerPageSelector";
 import { getTagColor } from "../utils/tagColors";
 
 export default function EventsListPage() {
@@ -17,8 +18,24 @@ export default function EventsListPage() {
   const { tags } = useAppSelector((s) => s.tags);
   const [searchParams, setSearchParams] = useSearchParams();
   const page = parseInt(searchParams.get("page") ?? "1", 10);
+  const limit = parseInt(searchParams.get("limit") ?? "12", 10);
   const setPage = (p: number) =>
-    setSearchParams((prev) => { prev.set("page", String(p)); return prev; }, { replace: true });
+    setSearchParams(
+      (prev) => {
+        prev.set("page", String(p));
+        return prev;
+      },
+      { replace: true },
+    );
+  const setLimit = (l: number) =>
+    setSearchParams(
+      (prev) => {
+        prev.set("limit", String(l));
+        prev.set("page", "1");
+        return prev;
+      },
+      { replace: true },
+    );
   const [query, setQuery] = useState("");
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
@@ -27,9 +44,9 @@ export default function EventsListPage() {
   }, []);
 
   useEffect(() => {
-    dispatch(fetchEvents({ page, tagIds: selectedTagIds }));
+    dispatch(fetchEvents({ page, limit, tagIds: selectedTagIds }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, selectedTagIds]);
+  }, [page, limit, selectedTagIds]);
 
   const handleTagToggle = (id: string) => {
     setPage(1);
@@ -62,18 +79,21 @@ export default function EventsListPage() {
         </p>
       </div>
 
-      <div className="relative mb-4 max-w-md">
-        <Search
-          size={16}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-        />
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search events..."
-          className="bg-white w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent"
-        />
+      <div className="flex items-center gap-3 mb-4 flex-wrap">
+        <div className="relative flex-1 min-w-[200px] max-w-md">
+          <Search
+            size={16}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+          />
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search events..."
+            className="bg-white w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent"
+          />
+        </div>
+        <PerPageSelector value={limit} onChange={setLimit} />
       </div>
 
       {tags.length > 0 && (
