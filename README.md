@@ -16,21 +16,24 @@ A full-stack event management application where users can discover, create, and 
 
 - **Authentication** — Register and log in with JWT-based auth
 - **Events** — Create, edit, delete events with title, description, date, location, capacity and visibility
+- **Tags** — Attach color-coded tags to events; filter and search by tag
 - **Discover** — Browse all upcoming public events (past events filtered out)
 - **My Events** — View events you've created or joined in a custom calendar (Month / Week / Day / Agenda / Year views)
 - **Join / Leave** — Join or leave any public event
+- **AI Assistant** — Chat with an AI assistant (Groq llama-3.3-70b) about your events and public events
 - **Seed data** — On first run, the database is automatically populated with demo users and events
 
 ---
 
 ## Tech Stack
 
-| Layer    | Technology                                                 |
-| -------- | ---------------------------------------------------------- |
-| Frontend | React 18, TypeScript, Vite, Tailwind CSS v4, Redux Toolkit |
-| Backend  | NestJS, TypeScript, Prisma ORM, Passport JWT               |
-| Database | PostgreSQL 16                                              |
-| DevOps   | Docker, docker-compose                                     |
+| Layer     | Technology                                                                  |
+| --------- | --------------------------------------------------------------------------- |
+| Frontend  | React 18, TypeScript, Vite, Tailwind CSS v4, Redux Toolkit, Zustand         |
+| Backend   | NestJS, TypeScript, Prisma ORM, Passport JWT, Groq SDK                      |
+| Database  | PostgreSQL 16                                                               |
+| DevOps    | Docker, docker-compose                                                      |
+| Storybook | Component documentation and visual testing                                  |
 
 ---
 
@@ -187,6 +190,20 @@ cd frontend && npm run dev
 | GET    | `/users/me`        | Yes  | Get current user profile                     |
 | GET    | `/users/me/events` | Yes  | Get events created or joined by current user |
 
+### Tags
+
+| Method | Endpoint     | Auth | Description        |
+| ------ | ------------ | ---- | ------------------ |
+| GET    | `/tags`      | No   | Get all tags       |
+| POST   | `/tags`      | Yes  | Create a new tag   |
+| DELETE | `/tags/:id`  | Yes  | Delete a tag       |
+
+### AI Assistant
+
+| Method | Endpoint   | Auth | Description                                         |
+| ------ | ---------- | ---- | --------------------------------------------------- |
+| POST   | `/ai/ask`  | Yes  | Ask a question about your events (Groq LLM backend) |
+
 ---
 
 ## Project Structure
@@ -210,16 +227,26 @@ Application/
 │       │   ├── dto/event.dto.ts    ← CreateEventDto, UpdateEventDto
 │       │   ├── events.service.ts   ← business logic, Prisma queries
 │       │   └── events.controller.ts
+│       ├── tags/                   ← GET/POST/DELETE /tags
+│       │   ├── dto/tag.dto.ts
+│       │   ├── tags.service.ts
+│       │   └── tags.controller.ts
+│       ├── ai/                     ← POST /ai/ask (Groq LLM)
+│       │   ├── ai.service.ts       ← buildContext() + Groq chat completion
+│       │   └── ai.controller.ts
 │       ├── users/                  ← GET /users/me, GET /users/me/events
 │       ├── prisma/                 ← PrismaService (global DB client)
 │       ├── app.module.ts
 │       └── main.ts                 ← Swagger /api/docs, ValidationPipe, CORS
 ├── frontend/                       # React 18 + Vite SPA
+│   ├── .storybook/                 ← Storybook configuration
 │   └── src/
 │       ├── api/axios.ts            ← Axios instance with JWT interceptor
 │       ├── store/
-│       │   ├── slices/authSlice.ts     ← login, register, fetchMe
-│       │   └── slices/eventsSlice.ts   ← events CRUD, join/leave
+│       │   ├── slices/authSlice.ts     ← login, register, fetchMe (Redux)
+│       │   ├── slices/eventsSlice.ts   ← events CRUD, join/leave (Redux)
+│       │   ├── slices/tagsSlice.ts     ← tags list (Redux)
+│       │   └── useUIStore.ts           ← assistant open/close (Zustand)
 │       ├── pages/
 │       │   ├── LoginPage           ← /login
 │       │   ├── RegisterPage        ← /register
@@ -231,10 +258,14 @@ Application/
 │       └── components/
 │           ├── calendar/           ← Month, Week, Day, Agenda, Year views
 │           ├── Navbar.tsx
-│           ├── EventCard.tsx
-│           ├── ProtectedRoute.tsx
-│           └── ConfirmModal.tsx
+│           ├── EventCard.tsx       ← EventCard.stories.tsx
+│           ├── TagChip.tsx         ← TagChip.stories.tsx
+│           ├── TagSelector.tsx     ← TagSelector.stories.tsx
+│           ├── ConfirmModal.tsx    ← ConfirmModal.stories.tsx
+│           ├── LoadingSpinner.tsx  ← LoadingSpinner.stories.tsx
+│           ├── AssistantDrawer.tsx ← AI chat drawer (Zustand state)
+│           ├── AIAssistantFAB.tsx  ← floating action button (logged-in only)
+│           └── ProtectedRoute.tsx
 ├── docker-compose.yml              ← postgres + backend + frontend
 └── .env.example
-└── .env
 ```
