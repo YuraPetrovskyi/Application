@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import type { AppView } from "../components/calendar/types";
 
 interface UIStore {
   assistantOpen: boolean;
@@ -7,6 +8,10 @@ interface UIStore {
   closeAssistant: () => void;
   eventsPerPage: number;
   setEventsPerPage: (n: number) => void;
+  calendarView: AppView;
+  setCalendarView: (v: AppView) => void;
+  calendarDate: string; // ISO string — Date is not serializable in localStorage
+  setCalendarDate: (d: Date) => void;
 }
 
 export const useUIStore = create<UIStore>()(
@@ -17,11 +22,18 @@ export const useUIStore = create<UIStore>()(
       closeAssistant: () => set({ assistantOpen: false }),
       eventsPerPage: 12,
       setEventsPerPage: (n) => set({ eventsPerPage: n }),
+      calendarView: "month",
+      setCalendarView: (v) => set({ calendarView: v }),
+      calendarDate: new Date().toISOString(),
+      setCalendarDate: (d) => set({ calendarDate: d.toISOString() }),
     }),
     {
       name: "ui-preferences",
-      // Only persist the preference, not the drawer state
-      partialize: (state) => ({ eventsPerPage: state.eventsPerPage }),
+      partialize: (state) => ({
+        eventsPerPage: state.eventsPerPage,
+        calendarView: state.calendarView,
+        calendarDate: state.calendarDate,
+      }),
     },
   ),
 );
