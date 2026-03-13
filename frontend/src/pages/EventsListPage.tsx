@@ -8,6 +8,7 @@ import EventCard from "../components/EventCard";
 import LoadingSpinner from "../components/LoadingSpinner";
 import Pagination from "../components/Pagination";
 import PerPageSelector from "../components/PerPageSelector";
+import { useUIStore } from "../store/useUIStore";
 import { getTagColor } from "../utils/tagColors";
 
 export default function EventsListPage() {
@@ -16,9 +17,9 @@ export default function EventsListPage() {
     (s) => s.events,
   );
   const { tags } = useAppSelector((s) => s.tags);
+  const { eventsPerPage, setEventsPerPage } = useUIStore();
   const [searchParams, setSearchParams] = useSearchParams();
   const page = parseInt(searchParams.get("page") ?? "1", 10);
-  const limit = parseInt(searchParams.get("limit") ?? "12", 10);
   const setPage = (p: number) =>
     setSearchParams(
       (prev) => {
@@ -27,15 +28,10 @@ export default function EventsListPage() {
       },
       { replace: true },
     );
-  const setLimit = (l: number) =>
-    setSearchParams(
-      (prev) => {
-        prev.set("limit", String(l));
-        prev.set("page", "1");
-        return prev;
-      },
-      { replace: true },
-    );
+  const setLimit = (l: number) => {
+    setEventsPerPage(l);
+    setPage(1);
+  };
   const [query, setQuery] = useState("");
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
@@ -44,9 +40,11 @@ export default function EventsListPage() {
   }, []);
 
   useEffect(() => {
-    dispatch(fetchEvents({ page, limit, tagIds: selectedTagIds }));
+    dispatch(
+      fetchEvents({ page, limit: eventsPerPage, tagIds: selectedTagIds }),
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, limit, selectedTagIds]);
+  }, [page, eventsPerPage, selectedTagIds]);
 
   const handleTagToggle = (id: string) => {
     setPage(1);
@@ -93,7 +91,7 @@ export default function EventsListPage() {
             className="bg-white w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent"
           />
         </div>
-        <PerPageSelector value={limit} onChange={setLimit} />
+        <PerPageSelector value={eventsPerPage} onChange={setLimit} />
       </div>
 
       {tags.length > 0 && (
