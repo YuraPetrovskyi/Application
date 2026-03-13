@@ -4,6 +4,7 @@ import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AssistantDrawer from "./components/AssistantDrawer";
+import AIAssistantFAB from "./components/AIAssistantFAB";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import EventsListPage from "./pages/EventsListPage";
@@ -29,6 +30,7 @@ function AppRoutes() {
     <>
       <Navbar />
       <AssistantDrawer />
+      <AIAssistantFAB />
       <main>
         <Routes>
           <Route path="/" element={<EventsListPage />} />

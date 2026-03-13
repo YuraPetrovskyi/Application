@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
 import { logout } from "../store/slices/authSlice";
-import { openAssistant } from "../store/slices/uiSlice";
-import { Calendar, LogOut, Plus, User, List, Menu, X, Bot } from "lucide-react";
+import { Calendar, LogOut, Plus, User, List, Menu, X } from "lucide-react";
 
 export default function Navbar() {
   const dispatch = useAppDispatch();
@@ -57,13 +56,6 @@ export default function Navbar() {
                 <Calendar size={16} />
                 My Events
               </Link>
-              <button
-                onClick={() => dispatch(openAssistant())}
-                className="flex items-center gap-1.5 text-gray-600 hover:text-indigo-600 font-medium transition-colors"
-              >
-                <Bot size={16} />
-                AI Assistant
-              </button>
               <Link
                 to="/events/create"
                 className="flex items-center gap-1.5 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
@@ -91,7 +83,7 @@ export default function Navbar() {
                 to="/login"
                 className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
               >
-                Login
+                Log in
               </Link>
               <Link
                 to="/register"
@@ -134,16 +126,6 @@ export default function Navbar() {
                 <Calendar size={16} className="text-gray-400" />
                 My Events
               </Link>
-              <button
-                onClick={() => {
-                  dispatch(openAssistant());
-                  close();
-                }}
-                className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors text-left"
-              >
-                <Bot size={16} className="text-gray-400" />
-                AI Assistant
-              </button>
               <Link
                 to="/events/create"
                 onClick={close}
@@ -175,7 +157,7 @@ export default function Navbar() {
                 onClick={close}
                 className="flex w-50 items-center mx-auto justify-center gap-2 px-3 py-2.5 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition-colors"
               >
-                Login
+                Log in
               </Link>
               <p className="text-center">or</p>
               <Link
