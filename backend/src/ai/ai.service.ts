@@ -40,10 +40,20 @@ export class AiService {
         {
           role: 'system',
           content: `You are a helpful assistant for an event management platform.
-You have access to the current user's events listed below.
-Answer questions about events concisely and helpfully.
-If asked about events not in the list, say you don't have information about them.
-If the question is unclear, off-topic, or cannot be answered based on the events data, you MUST respond with exactly: "Sorry, I didn't understand that. Please try rephrasing your question."
+You have access to two data sources provided below:
+1. USER'S EVENTS — events the current user organized or joined (past and future).
+2. UPCOMING PUBLIC EVENTS — all public events from all users, upcoming only.
+
+Use both sections to answer questions. Examples of what you can answer:
+- Questions about the user's own events (organized, joined, upcoming, past)
+- Questions about public events, including filtering by tag (e.g. "tech events", "music events this weekend")
+- Participant counts for any listed event
+- Dates, locations, organizers of any listed event
+
+Response rules — follow strictly:
+1. ALWAYS give a complete, direct answer. Never ask the user a follow-up question.
+2. If an event name is mentioned but not found in the data, respond: "I don't have any information about an event with that name. Please double-check the event name, or browse the events list."
+3. If the question is off-topic or unrelated to events, respond with exactly: "Sorry, I didn't understand that. Please try rephrasing your question."
 Today's date is ${today()}.
 
 ${context}`,
@@ -61,7 +71,9 @@ ${context}`,
   }
 
   private async buildContext(userId: string): Promise<string> {
-    const [organizedEvents, participations] = await Promise.all([
+    const now = new Date();
+
+    const [organizedEvents, participations, publicEvents] = await Promise.all([
       this.prisma.event.findMany({
         where: { organizerId: userId },
         include: {
@@ -82,6 +94,19 @@ ${context}`,
         },
         orderBy: { event: { dateTime: 'asc' } },
       }),
+      this.prisma.event.findMany({
+        where: {
+          visibility: 'PUBLIC',
+          dateTime: { gte: now },
+        },
+        include: {
+          tags: { include: { tag: true } },
+          _count: { select: { participants: true } },
+          organizer: { select: { name: true } },
+        },
+        orderBy: { dateTime: 'asc' },
+        take: 50,
+      }),
     ]);
 
     const formatEvent = (e: any) => {
@@ -93,6 +118,15 @@ ${context}`,
       return `- "${e.title}" | ${fmt(e.dateTime)} | ${e.location} | tags: ${tags} | ${capacity}`;
     };
 
+    const formatPublicEvent = (e: any) => {
+      const tags = e.tags?.map((et: any) => et.tag.name).join(', ') || 'none';
+      const joined = e._count?.participants ?? 0;
+      const capacity = e.capacity
+        ? `${joined}/${e.capacity} participants`
+        : `${joined} participants (unlimited)`;
+      return `- "${e.title}" | ${fmt(e.dateTime)} | ${e.location} | tags: ${tags} | ${capacity} | organizer: ${e.organizer.name}`;
+    };
+
     const organized = organizedEvents.map(formatEvent).join('\n') || '  (none)';
 
     const joinedIds = new Set(organizedEvents.map((e) => e.id));
@@ -102,6 +136,16 @@ ${context}`,
         .map((p) => formatEvent(p.event))
         .join('\n') || '  (none)';
 
-    return `=== USER'S EVENTS ===\n[Organized by user]\n${organized}\n\n[Joined by user]\n${joinedEvents}`;
+    const publicSection =
+      publicEvents.map(formatPublicEvent).join('\n') || '  (none)';
+
+    return [
+      `=== USER'S EVENTS ===`,
+      `[Organized by user]\n${organized}`,
+      `[Joined by user]\n${joinedEvents}`,
+      ``,
+      `=== UPCOMING PUBLIC EVENTS (all users) ===`,
+      publicSection,
+    ].join('\n\n');
   }
 }
