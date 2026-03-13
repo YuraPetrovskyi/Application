@@ -8,9 +8,9 @@ import {
   leaveEvent,
   deleteEvent,
 } from "../store/slices/eventsSlice";
-import LoadingSpinner from "../components/LoadingSpinner";
-import ConfirmModal from "../components/ConfirmModal";
-import BackButton from "../components/BackButton";
+import LoadingSpinner from "../components/ui/LoadingSpinner";
+import ConfirmModal from "../components/events/ConfirmModal";
+import BackButton from "../components/ui/BackButton";
 import toast from "react-hot-toast";
 import {
   CalendarDays,
@@ -23,7 +23,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import TagChip from "../components/TagChip";
+import TagChip from "../components/events/TagChip";
 
 export default function EventDetailsPage() {
   const { id } = useParams<{ id: string }>();

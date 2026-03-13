@@ -5,9 +5,9 @@ import dayjs from "dayjs";
 import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
 import { fetchEvent, updateEvent } from "../store/slices/eventsSlice";
 import { fetchTags } from "../store/slices/tagsSlice";
-import TagSelector from "../components/TagSelector";
-import LoadingSpinner from "../components/LoadingSpinner";
-import BackButton from "../components/BackButton";
+import TagSelector from "../components/events/TagSelector";
+import LoadingSpinner from "../components/ui/LoadingSpinner";
+import BackButton from "../components/ui/BackButton";
 import toast from "react-hot-toast";
 
 interface FormData {

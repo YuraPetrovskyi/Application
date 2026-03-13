@@ -4,10 +4,10 @@ import { Search } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
 import { fetchEvents } from "../store/slices/eventsSlice";
 import { fetchTags } from "../store/slices/tagsSlice";
-import EventCard from "../components/EventCard";
-import LoadingSpinner from "../components/LoadingSpinner";
-import Pagination from "../components/Pagination";
-import PerPageSelector from "../components/PerPageSelector";
+import EventCard from "../components/events/EventCard";
+import LoadingSpinner from "../components/ui/LoadingSpinner";
+import Pagination from "../components/pagination/Pagination";
+import PerPageSelector from "../components/pagination/PerPageSelector";
 import { useUIStore } from "../store/useUIStore";
 import { getTagColor } from "../utils/tagColors";
 

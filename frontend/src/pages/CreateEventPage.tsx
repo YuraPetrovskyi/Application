@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
 import { createEvent } from "../store/slices/eventsSlice";
 import { fetchTags } from "../store/slices/tagsSlice";
-import TagSelector from "../components/TagSelector";
-import BackButton from "../components/BackButton";
+import TagSelector from "../components/events/TagSelector";
+import BackButton from "../components/ui/BackButton";
 import toast from "react-hot-toast";
 
 interface FormData {

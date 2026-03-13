@@ -4,8 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
 import { login } from "../store/slices/authSlice";
 import toast from "react-hot-toast";
-import Button from "../components/Button";
-import Input from "../components/Input";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
 
 interface FormData {
   email: string;

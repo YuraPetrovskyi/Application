@@ -3,10 +3,10 @@ import { MemoryRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import EventCard from "./EventCard";
-import type { Event } from "../types";
-import authReducer from "../store/slices/authSlice";
-import eventsReducer from "../store/slices/eventsSlice";
-import tagsReducer from "../store/slices/tagsSlice";
+import type { Event } from "../../types";
+import authReducer from "../../store/slices/authSlice";
+import eventsReducer from "../../store/slices/eventsSlice";
+import tagsReducer from "../../store/slices/tagsSlice";
 
 /** Minimal Redux store so EventCard's dispatch/selector calls don't crash. */
 function makeStore(userId: string | null = "user-1") {

@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
 import { fetchMyEvents } from "../store/slices/eventsSlice";
-import LoadingSpinner from "../components/LoadingSpinner";
+import LoadingSpinner from "../components/ui/LoadingSpinner";
 import { Plus, ChevronRight, ChevronLeft } from "lucide-react";
 import type { AppView, CalendarEvent } from "../components/calendar/types";
 import { useUIStore } from "../store/useUIStore";

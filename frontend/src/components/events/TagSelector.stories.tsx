@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import TagSelector from "./TagSelector";
-import type { Tag } from "../types";
+import type { Tag } from "../../types";
 
 const TAGS: Tag[] = [
   { id: "1", name: "Tech" },
