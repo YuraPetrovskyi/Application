@@ -70,14 +70,16 @@ export default function AssistantDrawer() {
         { role: "assistant", text: res.data.answer },
       ]);
     } catch (err: any) {
+      const status = err.response?.status;
+      const text =
+        status === 429
+          ? "You've sent too many messages. Please wait a moment before trying again."
+          : status === 503
+            ? "AI service is temporarily unavailable. Please try again in a few minutes."
+            : err.response?.data?.message || "Something went wrong. Try again.";
       setMessages((prev) => [
         ...prev,
-        {
-          role: "assistant",
-          text:
-            err.response?.data?.message || "Something went wrong. Try again.",
-          error: true,
-        },
+        { role: "assistant", text, error: true },
       ]);
     } finally {
       setLoading(false);

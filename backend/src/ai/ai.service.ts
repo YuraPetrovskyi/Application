@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Groq from 'groq-sdk';
 import { PrismaService } from '../prisma/prisma.service';
@@ -34,12 +34,13 @@ export class AiService {
   async ask(question: string, userId: string): Promise<string> {
     const context = await this.buildContext(userId);
 
-    const completion = await this.groq.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
-      messages: [
-        {
-          role: 'system',
-          content: `You are a helpful assistant for an event management platform.
+    try {
+      const completion = await this.groq.chat.completions.create({
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          {
+            role: 'system',
+            content: `You are a helpful assistant for an event management platform.
 You have access to two data sources provided below:
 1. USER'S EVENTS — events the current user organized or joined (past and future).
 2. UPCOMING PUBLIC EVENTS — all public events from all users, upcoming only.
@@ -57,17 +58,26 @@ Response rules — follow strictly:
 Today's date is ${today()}.
 
 ${context}`,
-        },
-        {
-          role: 'user',
-          content: question,
-        },
-      ],
-      max_tokens: 512,
-      temperature: 0.7,
-    });
+          },
+          {
+            role: 'user',
+            content: question,
+          },
+        ],
+        max_tokens: 512,
+        temperature: 0.7,
+      });
 
-    return completion.choices[0]?.message?.content ?? 'No response from AI.';
+      return completion.choices[0]?.message?.content ?? 'No response from AI.';
+    } catch (err: any) {
+      if (err?.status === 429) {
+        throw new HttpException(
+          'AI service is temporarily unavailable due to quota limits. Please try again later.',
+          HttpStatus.SERVICE_UNAVAILABLE,
+        );
+      }
+      throw err;
+    }
   }
 
   private async buildContext(userId: string): Promise<string> {
