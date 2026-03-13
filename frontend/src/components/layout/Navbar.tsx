@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
-import { logout } from "../store/slices/authSlice";
+import { useAppDispatch, useAppSelector } from "../../hooks/useAppStore";
+import { logout } from "../../store/slices/authSlice";
 import { Calendar, LogOut, Plus, User, List, Menu, X } from "lucide-react";
 
 export default function Navbar() {

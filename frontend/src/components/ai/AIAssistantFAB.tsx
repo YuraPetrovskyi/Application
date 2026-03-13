@@ -1,6 +1,6 @@
 import { Bot } from "lucide-react";
-import { useAppSelector } from "../hooks/useAppStore";
-import { useUIStore } from "../store/useUIStore";
+import { useAppSelector } from "../../hooks/useAppStore";
+import { useUIStore } from "../../store/useUIStore";
 
 /**
  * Floating Action Button that opens the AI Assistant drawer.

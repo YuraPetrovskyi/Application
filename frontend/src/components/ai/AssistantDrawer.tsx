@@ -8,8 +8,8 @@ import {
   User,
   X,
 } from "lucide-react";
-import { useUIStore } from "../store/useUIStore";
-import api from "../api/axios";
+import { useUIStore } from "../../store/useUIStore";
+import api from "../../api/axios";
 
 interface Message {
   role: "user" | "assistant";

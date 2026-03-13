@@ -1,5 +1,5 @@
-import type { Tag } from "../types";
-import { getTagColor } from "../utils/tagColors";
+import type { Tag } from "../../types";
+import { getTagColor } from "../../utils/tagColors";
 
 interface Props {
   /** The tag object to display. */

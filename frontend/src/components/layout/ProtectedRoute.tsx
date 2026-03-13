@@ -1,7 +1,11 @@
-import { Navigate } from 'react-router-dom';
-import { useAppSelector } from '../hooks/useAppStore';
+import { Navigate } from "react-router-dom";
+import { useAppSelector } from "../../hooks/useAppStore";
 
-export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
+export default function ProtectedRoute({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { token } = useAppSelector((s) => s.auth);
   if (!token) return <Navigate to="/login" replace />;
   return <>{children}</>;

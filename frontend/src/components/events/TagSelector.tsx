@@ -1,4 +1,4 @@
-import type { Tag } from "../types";
+import type { Tag } from "../../types";
 
 interface Props {
   /** Full list of available tags to choose from. */

@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-import type { Event } from "../types";
-import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
-import { joinEvent, leaveEvent } from "../store/slices/eventsSlice";
+import type { Event } from "../../types";
+import { useAppDispatch, useAppSelector } from "../../hooks/useAppStore";
+import { joinEvent, leaveEvent } from "../../store/slices/eventsSlice";
 import toast from "react-hot-toast";
 import { Calendar, MapPin, Users, Clock4 } from "lucide-react";
-import TagChip from "../components/TagChip";
+import TagChip from "./TagChip";
 
 interface Props {
   event: Event;
