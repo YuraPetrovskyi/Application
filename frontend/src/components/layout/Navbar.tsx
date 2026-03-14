@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
-import { logout } from "../store/slices/authSlice";
+import { useAppDispatch, useAppSelector } from "../../hooks/useAppStore";
+import { logout } from "../../store/slices/authSlice";
 import { Calendar, LogOut, Plus, User, List, Menu, X } from "lucide-react";
 
 export default function Navbar() {
@@ -83,7 +83,7 @@ export default function Navbar() {
                 to="/login"
                 className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
               >
-                Login
+                Log in
               </Link>
               <Link
                 to="/register"
@@ -157,7 +157,7 @@ export default function Navbar() {
                 onClick={close}
                 className="flex w-50 items-center mx-auto justify-center gap-2 px-3 py-2.5 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition-colors"
               >
-                Login
+                Log in
               </Link>
               <p className="text-center">or</p>
               <Link

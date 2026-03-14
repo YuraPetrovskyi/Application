@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   UseGuards,
   Request,
   HttpCode,
@@ -15,6 +16,7 @@ import {
   ApiTags,
   ApiOperation,
   ApiResponse,
+  ApiQuery,
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { EventsService } from './events.service';
@@ -30,11 +32,44 @@ export class EventsController {
 
   @Get()
   @UseGuards(OptionalJwtAuthGuard)
-  @ApiOperation({ summary: 'Get all public events' })
-  @ApiResponse({ status: 200, description: 'List of public events' })
-  async findAll(@Request() req: any) {
+  @ApiOperation({ summary: 'Get paginated public events' })
+  @ApiQuery({
+    name: 'tagIds',
+    required: false,
+    type: [String],
+    description: 'Filter by tag IDs',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number (default: 1)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Events per page (default: 12)',
+  })
+  @ApiResponse({ status: 200, description: 'Paginated list of public events' })
+  async findAll(
+    @Request() req: any,
+    @Query('tagIds') tagIds?: string | string[],
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
     const userId = req.user?.id;
-    return this.eventsService.findAll(userId);
+    const tagIdsArray = tagIds
+      ? Array.isArray(tagIds)
+        ? tagIds
+        : [tagIds]
+      : undefined;
+    return this.eventsService.findAll(
+      userId,
+      tagIdsArray,
+      page ? parseInt(page, 10) : 1,
+      limit ? parseInt(limit, 10) : 12,
+    );
   }
 
   @Get(':id')

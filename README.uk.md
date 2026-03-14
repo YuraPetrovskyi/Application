@@ -15,22 +15,27 @@ Full-stack застосунок для управління подіями, де
 ## Функціонал
 
 - **Автентифікація** — Реєстрація та вхід з JWT-авторизацією
+- **Безпека** — HTTP заголовки безпеки (helmet), обмеження запитів на auth та AI endpoints
 - **Події** — Створення, редагування, видалення подій із назвою, описом, датою, локацією, місткістю та видимістю
+- **Теги** — Додавання кольорових тегів до подій; фільтрація та пошук за тегом
 - **Огляд** — Перегляд усіх майбутніх публічних подій (минулі події відфільтровані)
 - **Мої події** — Перегляд подій, які ти створив або відвідуєш, у кастомному календарі (вигляди: Місяць / Тиждень / День / Порядок / Рік)
 - **Приєднатись / Вийти** — Приєднатись або покинути будь-яку публічну подію
+- **Пагінація** — Налаштовувана кількість подій на сторінці (6 / 12 / 24), номер сторінки в URL, налаштування збережені в localStorage
+- **AI Асистент** — Чат з AI асистентом (Groq llama-3.3-70b) про твої події та публічні події
 - **Seed-дані** — При першому запуску база даних автоматично заповнюється демонстраційними користувачами та подіями
 
 ---
 
 ## Технологічний стек
 
-| Рівень     | Технологія                                                 |
-| ---------- | ---------------------------------------------------------- |
-| Frontend   | React 18, TypeScript, Vite, Tailwind CSS v4, Redux Toolkit |
-| Backend    | NestJS, TypeScript, Prisma ORM, Passport JWT               |
-| База даних | PostgreSQL 16                                              |
-| DevOps     | Docker, docker-compose                                     |
+| Рівень     | Технологія                                                          |
+| ---------- | ------------------------------------------------------------------- |
+| Frontend   | React 18, TypeScript, Vite, Tailwind CSS v4, Redux Toolkit, Zustand |
+| Backend    | NestJS, TypeScript, Prisma ORM, Passport JWT, Groq SDK              |
+| База даних | PostgreSQL 16                                                       |
+| DevOps     | Docker, docker-compose                                              |
+| Storybook  | Документація компонентів та візуальне тестування                    |
 
 ---
 
@@ -49,20 +54,23 @@ cd Application
 
 **2. Створи файл змінних середовища**
 
+> **Які `.env` для чого?**
+> - **`.env`** (корінь) — використовується тільки Docker Compose
+> - **`backend/.env`** — для локальної розробки (`npm run start:dev`)
+> - **`frontend/.env`** — для локальної розробки (`npm run dev`)
+
 ```bash
 cp .env.example .env
 ```
 
-Відкрий `.env` і встанови безпечне значення для `JWT_SECRET`. Згенеруй його командою або іншим методом:
-
-```bash
-node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
-```
-
-Встав результат у `.env`:
+Відкрий `.env` і заповни обов'язкові значення:
 
 ```env
+# Згенеруй: node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 JWT_SECRET="встав-згенероване-значення"
+
+# Безкоштовний ключ: https://console.groq.com
+GROQ_API_KEY="gsk_твій-ключ-тут"
 ```
 
 **3. Запусти застосунок**
@@ -121,7 +129,7 @@ cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
 ```
 
-Відкрий `backend/.env` і встанови пароль PostgreSQL та безпечний `JWT_SECRET`.
+Відкрий `backend/.env` і встанови пароль PostgreSQL, безпечний `JWT_SECRET` та `GROQ_API_KEY` (необхідний для AI Асистента).
 
 **3. Налаштуй базу даних**
 
@@ -156,6 +164,7 @@ cd frontend && npm run dev
 | `PORT`              | Порт backend-сервера                          | `3000`                  |
 | `FRONTEND_URL`      | URL фронтенду — backend використовує для CORS | `http://localhost:5173` |
 | `VITE_API_URL`      | URL backend для frontend                      | `http://localhost:3000` |
+| `GROQ_API_KEY`      | Ключ Groq API для AI Асистента                | —                       |
 
 ---
 
@@ -187,6 +196,20 @@ cd frontend && npm run dev
 | GET   | `/users/me`        | Так  | Отримати профіль поточного користувача                         |
 | GET   | `/users/me/events` | Так  | Отримати події, створені або відвідувані поточним користувачем |
 
+### Теги
+
+| Метод | Endpoint | Auth | Опис                                          |
+| ----- | -------- | ---- | --------------------------------------------- |
+| GET   | `/tags`  | Ні   | Отримати всі доступні теги (заповнені seed'ом) |
+
+> Теги керуються через seed бази даних (`prisma/seed.ts`). Наперед визначений набір: Tech, Art, Business, Music, Science, Sport, Education, Health.
+
+### AI Асистент
+
+| Метод | Endpoint  | Auth | Опис                                        |
+| ----- | --------- | ---- | ------------------------------------------- |
+| POST  | `/ai/ask` | Так  | Задати питання про події (Groq LLM backend) |
+
 ---
 
 ## Структура проекту
@@ -197,7 +220,7 @@ Application/
 │   ├── prisma/
 │   │   ├── schema.prisma           ← схема БД: User, Event, EventParticipant
 │   │   ├── migrations/             ← SQL міграції
-│   │   └── seed.ts                 ← демо-дані (2 користувачі, 3 події)
+│   │   └── seed.ts                 ← демо-дані (2 користувачі, 50 подій)
 │   └── src/
 │       ├── auth/                   ← POST /auth/register, POST /auth/login
 │       │   ├── dto/auth.dto.ts     ← RegisterDto, LoginDto (class-validator)
@@ -210,16 +233,26 @@ Application/
 │       │   ├── dto/event.dto.ts    ← CreateEventDto, UpdateEventDto
 │       │   ├── events.service.ts   ← бізнес-логіка, Prisma запити
 │       │   └── events.controller.ts
+│       ├── tags/                   ← GET/POST/DELETE /tags
+│       │   ├── dto/tag.dto.ts
+│       │   ├── tags.service.ts
+│       │   └── tags.controller.ts
+│       ├── ai/                     ← POST /ai/ask (Groq LLM)
+│       │   ├── ai.service.ts       ← buildContext() + Groq chat completion
+│       │   └── ai.controller.ts
 │       ├── users/                  ← GET /users/me, GET /users/me/events
 │       ├── prisma/                 ← PrismaService (глобальний DB клієнт)
 │       ├── app.module.ts
 │       └── main.ts                 ← Swagger /api/docs, ValidationPipe, CORS
 ├── frontend/                       # React 18 + Vite SPA
+│   ├── .storybook/                 ← конфігурація Storybook
 │   └── src/
 │       ├── api/axios.ts            ← Axios з JWT interceptor
 │       ├── store/
-│       │   ├── slices/authSlice.ts     ← login, register, fetchMe
-│       │   └── slices/eventsSlice.ts   ← CRUD подій, join/leave
+│       │   ├── slices/authSlice.ts     ← login, register, fetchMe (Redux)
+│       │   ├── slices/eventsSlice.ts   ← CRUD подій, join/leave (Redux)
+│       │   ├── slices/tagsSlice.ts     ← список тегів (Redux)
+│       │   └── useUIStore.ts           ← налаштування UI: сторінки, календар, асистент (Zustand + persist)
 │       ├── pages/
 │       │   ├── LoginPage           ← /login
 │       │   ├── RegisterPage        ← /register
@@ -229,11 +262,26 @@ Application/
 │       │   ├── EditEventPage       ← /events/:id/edit
 │       │   └── MyEventsPage        ← /my-events (кастомний календар)
 │       └── components/
-│           ├── calendar/           ← вигляди: Місяць, Тиждень, День, Порядок, Рік
-│           ├── Navbar.tsx
-│           ├── EventCard.tsx
-│           ├── ProtectedRoute.tsx
-│           └── ConfirmModal.tsx
+│           ├── ai/                     ← AI дровер + плаваюча кнопка
+│           │   ├── AssistantDrawer.tsx   ← AI чат-дровер (стан Zustand)
+│           │   └── AIAssistantFAB.tsx    ← плаваюча кнопка (тільки для залогінених)
+│           ├── calendar/               ← вигляди: Місяць, Тиждень, День, Порядок, Рік
+│           ├── events/                 ← компоненти рівня події
+│           │   ├── EventCard.tsx           ← EventCard.stories.tsx
+│           │   ├── TagChip.tsx             ← TagChip.stories.tsx
+│           │   ├── TagSelector.tsx         ← TagSelector.stories.tsx
+│           │   └── ConfirmModal.tsx
+│           ├── layout/                 ← оболонка застосунку
+│           │   ├── Navbar.tsx
+│           │   └── ProtectedRoute.tsx
+│           ├── pagination/             ← елементи пагінації
+│           │   ├── Pagination.tsx          ← Pagination.stories.tsx
+│           │   └── PerPageSelector.tsx     ← PerPageSelector.stories.tsx
+│           └── ui/                     ← загальні компоненти
+│               ├── Button.tsx              ← Button.stories.tsx
+│               ├── Input.tsx               ← Input.stories.tsx
+│               ├── BackButton.tsx          ← BackButton.stories.tsx
+│               └── LoadingSpinner.tsx      ← LoadingSpinner.stories.tsx
 ├── docker-compose.yml              ← postgres + backend + frontend
 └── .env.example
 ```

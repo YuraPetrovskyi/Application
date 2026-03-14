@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import type { CalendarEvent, AppView } from "./types";
+import { getTagColor } from "../../utils/tagColors";
 
 interface Props {
   events: CalendarEvent[];
@@ -109,18 +110,21 @@ export default function MonthView({
                     </button>
 
                     <div className="space-y-0.5">
-                      {visible.map((e) => (
-                        <button
-                          key={e.id}
-                          onClick={(ev) => {
-                            ev.stopPropagation();
-                            onSelectEvent(e);
-                          }}
-                          className="w-full text-left bg-indigo-50 border border-indigo-200 rounded px-1.5 py-0.5 text-[11px] font-medium text-indigo-800 truncate hover:bg-indigo-100 transition-colors"
-                        >
-                          {dayjs(e.start).format("H:mm")} {e.title}
-                        </button>
-                      ))}
+                      {visible.map((e) => {
+                        const color = getTagColor(e.resource.tags?.[0]?.name);
+                        return (
+                          <button
+                            key={e.id}
+                            onClick={(ev) => {
+                              ev.stopPropagation();
+                              onSelectEvent(e);
+                            }}
+                            className={`w-full text-left ${color.bg} border ${color.border} rounded px-1.5 py-0.5 text-[11px] font-medium ${color.text} truncate ${color.hoverBg} transition-colors`}
+                          >
+                            {dayjs(e.start).format("H:mm")} {e.title}
+                          </button>
+                        );
+                      })}
                       {overflow > 0 && (
                         <button
                           onClick={() => openDay(day)}

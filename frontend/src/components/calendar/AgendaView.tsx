@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import type { CalendarEvent } from "./types";
+import { getTagColor } from "../../utils/tagColors";
 
 interface Props {
   events: CalendarEvent[];
@@ -66,22 +67,27 @@ export default function AgendaView({
             </div>
 
             <div className="divide-y-2 divide-gray-200">
-              {grouped[dateStr].map((e) => (
-                <button
-                  key={e.id}
-                  onClick={() => onSelectEvent(e)}
-                  className="w-full text-left px-5 py-3 flex items-center gap-4 hover:bg-gray-200 transition-colors"
-                >
-                  <span className="text-sm text-gray-500 w-12 shrink-0 font-medium">
-                    {dayjs(e.start).format("H:mm")}
-                  </span>
-                  <div className="w-0.5 h-9 bg-indigo-200 rounded-full shrink-0" />
+              {grouped[dateStr].map((e) => {
+                const color = getTagColor(e.resource.tags?.[0]?.name);
+                return (
+                  <button
+                    key={e.id}
+                    onClick={() => onSelectEvent(e)}
+                    className="w-full text-left px-5 py-3 flex items-center gap-4 hover:bg-gray-50 transition-colors"
+                  >
+                    <span className="text-sm text-gray-500 w-12 shrink-0 font-medium">
+                      {dayjs(e.start).format("H:mm")}
+                    </span>
+                    <div
+                      className={`w-0.5 h-9 ${color.dividerBg} rounded-full shrink-0`}
+                    />
 
-                  <span className="flex-1 min-w-0 text-sm font-medium text-gray-700 truncate">
-                    {e.title}
-                  </span>
-                </button>
-              ))}
+                    <span className="flex-1 min-w-0 text-sm font-medium text-gray-700 truncate">
+                      {e.title}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         );

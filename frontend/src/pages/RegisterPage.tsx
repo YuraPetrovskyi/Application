@@ -4,6 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
 import { register as registerUser } from "../store/slices/authSlice";
 import toast from "react-hot-toast";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
 
 interface FormData {
   name: string;
@@ -52,66 +54,39 @@ export default function RegisterPage() {
           )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name
-              </label>
-              <input
-                {...register("name", { required: "Name is required" })}
-                placeholder="John Doe"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              />
-              {errors.name && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.name.message}
-                </p>
-              )}
-            </div>
+            <Input
+              {...register("name", { required: "Name is required" })}
+              label="Full Name"
+              type="text"
+              autoComplete="name"
+              placeholder="John Doe"
+              error={errors.name?.message}
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                {...register("email", { required: "Email is required" })}
-                type="email"
-                placeholder="you@example.com"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              />
-              {errors.email && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.email.message}
-                </p>
-              )}
-            </div>
+            <Input
+              {...register("email", { required: "Email is required" })}
+              label="Email"
+              type="email"
+              autoComplete="email"
+              placeholder="you@example.com"
+              error={errors.email?.message}
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <input
-                {...register("password", {
-                  required: "Password is required",
-                  minLength: { value: 6, message: "Min 6 characters" },
-                })}
-                type="password"
-                placeholder="••••••••"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              />
-              {errors.password && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
+            <Input
+              {...register("password", {
+                required: "Password is required",
+                minLength: { value: 6, message: "Min 6 characters" },
+              })}
+              label="Password"
+              type="password"
+              autoComplete="new-password"
+              placeholder="••••••••"
+              error={errors.password?.message}
+            />
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
+            <Button type="submit" loading={loading} fullWidth>
               {loading ? "Creating account..." : "Create Account"}
-            </button>
+            </Button>
           </form>
 
           <p className="text-center text-sm text-gray-500 mt-6">
@@ -120,7 +95,7 @@ export default function RegisterPage() {
               to="/login"
               className="text-indigo-600 font-medium hover:underline"
             >
-              Sign in
+              Log in
             </Link>
           </p>
         </div>

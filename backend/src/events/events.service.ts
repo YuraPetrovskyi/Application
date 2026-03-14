@@ -13,20 +13,40 @@ import { Visibility } from '@prisma/client';
 export class EventsService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(userId?: string) {
-    const events = await this.prisma.event.findMany({
-      where: { visibility: Visibility.PUBLIC },
-      include: {
-        organizer: { select: { id: true, name: true, email: true } },
-        participants: {
-          include: { user: { select: { id: true, name: true } } },
-        },
-        _count: { select: { participants: true } },
-      },
-      orderBy: { dateTime: 'asc' },
-    });
+  async findAll(userId?: string, tagIds?: string[], page = 1, limit = 12) {
+    const skip = (page - 1) * limit;
+    const where = {
+      visibility: Visibility.PUBLIC,
+      dateTime: { gte: new Date() },
+      ...(tagIds?.length && {
+        tags: { some: { tagId: { in: tagIds } } },
+      }),
+    };
 
-    return events.map((event) => this.formatEvent(event, userId));
+    const [events, total] = await Promise.all([
+      this.prisma.event.findMany({
+        where,
+        include: {
+          organizer: { select: { id: true, name: true, email: true } },
+          participants: {
+            include: { user: { select: { id: true, name: true } } },
+          },
+          tags: { include: { tag: true } },
+          _count: { select: { participants: true } },
+        },
+        orderBy: { dateTime: 'asc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.event.count({ where }),
+    ]);
+
+    return {
+      data: events.map((event) => this.formatEvent(event, userId)),
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async findOne(id: string, userId?: string) {
@@ -37,6 +57,7 @@ export class EventsService {
         participants: {
           include: { user: { select: { id: true, name: true } } },
         },
+        tags: { include: { tag: true } },
         _count: { select: { participants: true } },
       },
     });
@@ -71,12 +92,20 @@ export class EventsService {
         capacity: dto.capacity ?? null,
         visibility: dto.visibility ?? Visibility.PUBLIC,
         organizerId: userId,
+        ...(dto.tagIds?.length && {
+          tags: {
+            create: dto.tagIds.map((tagId) => ({
+              tag: { connect: { id: tagId } },
+            })),
+          },
+        }),
       },
       include: {
         organizer: { select: { id: true, name: true, email: true } },
         participants: {
           include: { user: { select: { id: true, name: true } } },
         },
+        tags: { include: { tag: true } },
         _count: { select: { participants: true } },
       },
     });
@@ -95,6 +124,10 @@ export class EventsService {
       throw new BadRequestException('Cannot set event date in the past');
     }
 
+    if ('tagIds' in dto) {
+      await this.prisma.eventTag.deleteMany({ where: { eventId: id } });
+    }
+
     const updated = await this.prisma.event.update({
       where: { id },
       data: {
@@ -104,12 +137,20 @@ export class EventsService {
         ...(dto.location && { location: dto.location }),
         ...('capacity' in dto && { capacity: dto.capacity ?? null }),
         ...(dto.visibility && { visibility: dto.visibility }),
+        ...('tagIds' in dto && {
+          tags: {
+            create: (dto.tagIds ?? []).map((tagId) => ({
+              tag: { connect: { id: tagId } },
+            })),
+          },
+        }),
       },
       include: {
         organizer: { select: { id: true, name: true, email: true } },
         participants: {
           include: { user: { select: { id: true, name: true } } },
         },
+        tags: { include: { tag: true } },
         _count: { select: { participants: true } },
       },
     });
@@ -191,6 +232,7 @@ export class EventsService {
             participants: {
               include: { user: { select: { id: true, name: true } } },
             },
+            tags: { include: { tag: true } },
             _count: { select: { participants: true } },
           },
         },
@@ -204,6 +246,7 @@ export class EventsService {
         participants: {
           include: { user: { select: { id: true, name: true } } },
         },
+        tags: { include: { tag: true } },
         _count: { select: { participants: true } },
       },
     });
@@ -250,6 +293,7 @@ export class EventsService {
       updatedAt: event.updatedAt,
       organizer: event.organizer,
       participants: event.participants?.map((p: any) => p.user) ?? [],
+      tags: event.tags?.map((et: any) => et.tag) ?? [],
       participantCount,
       isFull,
       isJoined,
