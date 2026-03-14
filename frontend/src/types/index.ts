@@ -7,11 +7,6 @@ export interface User {
 
 export type Visibility = "PUBLIC" | "PRIVATE";
 
-export interface Tag {
-  id: string;
-  name: string;
-}
-
 export interface Event {
   id: string;
   title: string;
@@ -23,7 +18,6 @@ export interface Event {
   createdAt: string;
   organizer: { id: string; name: string; email: string };
   participants: { id: string; name: string }[];
-  tags: Tag[];
   participantCount: number;
   isFull: boolean;
   isJoined: boolean;

@@ -32,7 +32,6 @@ services:
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
       PORT: 3000
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
-      GROQ_API_KEY: ${GROQ_API_KEY}
     ports:
       - "3000:3000"
 

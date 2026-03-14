@@ -4,8 +4,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
 import { login } from "../store/slices/authSlice";
 import toast from "react-hot-toast";
-import Button from "../components/ui/Button";
-import Input from "../components/ui/Input";
 
 interface FormData {
   email: string;
@@ -53,27 +51,47 @@ export default function LoginPage() {
           )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <Input
-              {...register("email", { required: "Email is required" })}
-              label="Email"
-              type="email"
-              autoComplete="email"
-              placeholder="you@example.com"
-              error={errors.email?.message}
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
+              <input
+                {...register("email", { required: "Email is required" })}
+                type="email"
+                placeholder="you@example.com"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
 
-            <Input
-              {...register("password", { required: "Password is required" })}
-              label="Password"
-              type="password"
-              autoComplete="current-password"
-              placeholder="••••••••"
-              error={errors.password?.message}
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Password
+              </label>
+              <input
+                {...register("password", { required: "Password is required" })}
+                type="password"
+                placeholder="••••••••"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              />
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
 
-            <Button type="submit" loading={loading} fullWidth>
-              {loading ? "Logging in..." : "Log in"}
-            </Button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {loading ? "Signing in..." : "Sign In"}
+            </button>
           </form>
 
           <p className="text-center text-sm text-gray-500 mt-6">
