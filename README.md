@@ -54,20 +54,23 @@ cd Application
 
 **2. Create environment file**
 
+> **Which `.env` is which?**
+> - **`.env`** (root) — used by Docker Compose only
+> - **`backend/.env`** — used for local development (`npm run start:dev`)
+> - **`frontend/.env`** — used for local development (`npm run dev`)
+
 ```bash
 cp .env.example .env
 ```
 
-Open `.env` and set a secure value for `JWT_SECRET`. Generate one with:
-
-```bash
-node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
-```
-
-Then paste the result:
+Open `.env` and fill in the required values:
 
 ```env
+# Generate with: node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 JWT_SECRET="paste-generated-value-here"
+
+# Get your free API key at https://console.groq.com
+GROQ_API_KEY="gsk_your-key-here"
 ```
 
 **3. Start the application**
@@ -126,7 +129,7 @@ cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
 ```
 
-Open `backend/.env` and set your PostgreSQL password and a secure `JWT_SECRET`.
+Open `backend/.env` and set your PostgreSQL password, a secure `JWT_SECRET`, and your `GROQ_API_KEY` (required for the AI Assistant).
 
 **3. Set up the database**
 
@@ -161,6 +164,7 @@ cd frontend && npm run dev
 | `PORT`              | Backend server port                                 | `3000`                  |
 | `FRONTEND_URL`      | Frontend origin allowed by CORS (backend uses this) | `http://localhost:5173` |
 | `VITE_API_URL`      | Backend URL used by the frontend                    | `http://localhost:3000` |
+| `GROQ_API_KEY`      | Groq API key for the AI Assistant                   | —                       |
 
 ---
 

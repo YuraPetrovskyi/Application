@@ -54,20 +54,23 @@ cd Application
 
 **2. Створи файл змінних середовища**
 
+> **Які `.env` для чого?**
+> - **`.env`** (корінь) — використовується тільки Docker Compose
+> - **`backend/.env`** — для локальної розробки (`npm run start:dev`)
+> - **`frontend/.env`** — для локальної розробки (`npm run dev`)
+
 ```bash
 cp .env.example .env
 ```
 
-Відкрий `.env` і встанови безпечне значення для `JWT_SECRET`. Згенеруй його командою або іншим методом:
-
-```bash
-node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
-```
-
-Встав результат у `.env`:
+Відкрий `.env` і заповни обов'язкові значення:
 
 ```env
+# Згенеруй: node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 JWT_SECRET="встав-згенероване-значення"
+
+# Безкоштовний ключ: https://console.groq.com
+GROQ_API_KEY="gsk_твій-ключ-тут"
 ```
 
 **3. Запусти застосунок**
@@ -126,7 +129,7 @@ cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
 ```
 
-Відкрий `backend/.env` і встанови пароль PostgreSQL та безпечний `JWT_SECRET`.
+Відкрий `backend/.env` і встанови пароль PostgreSQL, безпечний `JWT_SECRET` та `GROQ_API_KEY` (необхідний для AI Асистента).
 
 **3. Налаштуй базу даних**
 
@@ -161,6 +164,7 @@ cd frontend && npm run dev
 | `PORT`              | Порт backend-сервера                          | `3000`                  |
 | `FRONTEND_URL`      | URL фронтенду — backend використовує для CORS | `http://localhost:5173` |
 | `VITE_API_URL`      | URL backend для frontend                      | `http://localhost:3000` |
+| `GROQ_API_KEY`      | Ключ Groq API для AI Асистента                | —                       |
 
 ---
 
