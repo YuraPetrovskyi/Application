@@ -5,6 +5,8 @@ import {
   IsOptional,
   IsInt,
   IsEnum,
+  IsArray,
+  ArrayMaxSize,
   Min,
 } from 'class-validator';
 import { Visibility } from '@prisma/client';
@@ -36,6 +38,16 @@ export class CreateEventDto {
   @IsOptional()
   @IsEnum(Visibility)
   visibility?: Visibility;
+
+  @ApiPropertyOptional({
+    type: [String],
+    description: 'Array of tag IDs (max 5)',
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @ArrayMaxSize(5)
+  tagIds?: string[];
 }
 
 export class UpdateEventDto extends PartialType(CreateEventDto) {}

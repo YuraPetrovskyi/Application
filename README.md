@@ -15,22 +15,27 @@ A full-stack event management application where users can discover, create, and 
 ## Features
 
 - **Authentication** — Register and log in with JWT-based auth
+- **Security** — HTTP security headers (helmet), rate limiting on auth and AI endpoints
 - **Events** — Create, edit, delete events with title, description, date, location, capacity and visibility
+- **Tags** — Attach color-coded tags to events; filter and search by tag
 - **Discover** — Browse all upcoming public events (past events filtered out)
 - **My Events** — View events you've created or joined in a custom calendar (Month / Week / Day / Agenda / Year views)
 - **Join / Leave** — Join or leave any public event
+- **Pagination** — Configurable events per page (6 / 12 / 24), URL-synced page number, preferences persisted in localStorage
+- **AI Assistant** — Chat with an AI assistant (Groq llama-3.3-70b) about your events and public events
 - **Seed data** — On first run, the database is automatically populated with demo users and events
 
 ---
 
 ## Tech Stack
 
-| Layer    | Technology                                                 |
-| -------- | ---------------------------------------------------------- |
-| Frontend | React 18, TypeScript, Vite, Tailwind CSS v4, Redux Toolkit |
-| Backend  | NestJS, TypeScript, Prisma ORM, Passport JWT               |
-| Database | PostgreSQL 16                                              |
-| DevOps   | Docker, docker-compose                                     |
+| Layer     | Technology                                                          |
+| --------- | ------------------------------------------------------------------- |
+| Frontend  | React 18, TypeScript, Vite, Tailwind CSS v4, Redux Toolkit, Zustand |
+| Backend   | NestJS, TypeScript, Prisma ORM, Passport JWT, Groq SDK              |
+| Database  | PostgreSQL 16                                                       |
+| DevOps    | Docker, docker-compose                                              |
+| Storybook | Component documentation and visual testing                          |
 
 ---
 
@@ -49,20 +54,23 @@ cd Application
 
 **2. Create environment file**
 
+> **Which `.env` is which?**
+> - **`.env`** (root) — used by Docker Compose only
+> - **`backend/.env`** — used for local development (`npm run start:dev`)
+> - **`frontend/.env`** — used for local development (`npm run dev`)
+
 ```bash
 cp .env.example .env
 ```
 
-Open `.env` and set a secure value for `JWT_SECRET`. Generate one with:
-
-```bash
-node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
-```
-
-Then paste the result:
+Open `.env` and fill in the required values:
 
 ```env
+# Generate with: node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 JWT_SECRET="paste-generated-value-here"
+
+# Get your free API key at https://console.groq.com
+GROQ_API_KEY="gsk_your-key-here"
 ```
 
 **3. Start the application**
@@ -121,7 +129,7 @@ cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
 ```
 
-Open `backend/.env` and set your PostgreSQL password and a secure `JWT_SECRET`.
+Open `backend/.env` and set your PostgreSQL password, a secure `JWT_SECRET`, and your `GROQ_API_KEY` (required for the AI Assistant).
 
 **3. Set up the database**
 
@@ -156,6 +164,7 @@ cd frontend && npm run dev
 | `PORT`              | Backend server port                                 | `3000`                  |
 | `FRONTEND_URL`      | Frontend origin allowed by CORS (backend uses this) | `http://localhost:5173` |
 | `VITE_API_URL`      | Backend URL used by the frontend                    | `http://localhost:3000` |
+| `GROQ_API_KEY`      | Groq API key for the AI Assistant                   | —                       |
 
 ---
 
@@ -187,6 +196,20 @@ cd frontend && npm run dev
 | GET    | `/users/me`        | Yes  | Get current user profile                     |
 | GET    | `/users/me/events` | Yes  | Get events created or joined by current user |
 
+### Tags
+
+| Method | Endpoint | Auth | Description                                    |
+| ------ | -------- | ---- | ---------------------------------------------- |
+| GET    | `/tags`  | No   | Get all available tags (pre-seeded in the DB)  |
+
+> Tags are managed via the database seed (`prisma/seed.ts`). The predefined set includes: Tech, Art, Business, Music, Science, Sport, Education, Health.
+
+### AI Assistant
+
+| Method | Endpoint  | Auth | Description                                         |
+| ------ | --------- | ---- | --------------------------------------------------- |
+| POST   | `/ai/ask` | Yes  | Ask a question about your events (Groq LLM backend) |
+
 ---
 
 ## Project Structure
@@ -197,7 +220,7 @@ Application/
 │   ├── prisma/
 │   │   ├── schema.prisma           ← DB schema: User, Event, EventParticipant
 │   │   ├── migrations/             ← auto-generated SQL migrations
-│   │   └── seed.ts                 ← demo data (2 users, 3 events)
+│   │   └── seed.ts                 ← demo data (2 users, 50 events)
 │   └── src/
 │       ├── auth/                   ← POST /auth/register, POST /auth/login
 │       │   ├── dto/auth.dto.ts     ← RegisterDto, LoginDto (class-validator)
@@ -210,16 +233,26 @@ Application/
 │       │   ├── dto/event.dto.ts    ← CreateEventDto, UpdateEventDto
 │       │   ├── events.service.ts   ← business logic, Prisma queries
 │       │   └── events.controller.ts
+│       ├── tags/                   ← GET/POST/DELETE /tags
+│       │   ├── dto/tag.dto.ts
+│       │   ├── tags.service.ts
+│       │   └── tags.controller.ts
+│       ├── ai/                     ← POST /ai/ask (Groq LLM)
+│       │   ├── ai.service.ts       ← buildContext() + Groq chat completion
+│       │   └── ai.controller.ts
 │       ├── users/                  ← GET /users/me, GET /users/me/events
 │       ├── prisma/                 ← PrismaService (global DB client)
 │       ├── app.module.ts
 │       └── main.ts                 ← Swagger /api/docs, ValidationPipe, CORS
 ├── frontend/                       # React 18 + Vite SPA
+│   ├── .storybook/                 ← Storybook configuration
 │   └── src/
 │       ├── api/axios.ts            ← Axios instance with JWT interceptor
 │       ├── store/
-│       │   ├── slices/authSlice.ts     ← login, register, fetchMe
-│       │   └── slices/eventsSlice.ts   ← events CRUD, join/leave
+│       │   ├── slices/authSlice.ts     ← login, register, fetchMe (Redux)
+│       │   ├── slices/eventsSlice.ts   ← events CRUD, join/leave (Redux)
+│       │   ├── slices/tagsSlice.ts     ← tags list (Redux)
+│       │   └── useUIStore.ts           ← UI preferences: per-page, calendar, assistant (Zustand + persist)
 │       ├── pages/
 │       │   ├── LoginPage           ← /login
 │       │   ├── RegisterPage        ← /register
@@ -229,12 +262,26 @@ Application/
 │       │   ├── EditEventPage       ← /events/:id/edit
 │       │   └── MyEventsPage        ← /my-events (custom calendar)
 │       └── components/
-│           ├── calendar/           ← Month, Week, Day, Agenda, Year views
-│           ├── Navbar.tsx
-│           ├── EventCard.tsx
-│           ├── ProtectedRoute.tsx
-│           └── ConfirmModal.tsx
+│           ├── ai/                     ← AI drawer + floating action button
+│           │   ├── AssistantDrawer.tsx   ← AI chat drawer (Zustand state)
+│           │   └── AIAssistantFAB.tsx    ← floating action button (logged-in only)
+│           ├── calendar/               ← Month, Week, Day, Agenda, Year views
+│           ├── events/                 ← event-level UI components
+│           │   ├── EventCard.tsx           ← EventCard.stories.tsx
+│           │   ├── TagChip.tsx             ← TagChip.stories.tsx
+│           │   ├── TagSelector.tsx         ← TagSelector.stories.tsx
+│           │   └── ConfirmModal.tsx
+│           ├── layout/                 ← app shell
+│           │   ├── Navbar.tsx
+│           │   └── ProtectedRoute.tsx
+│           ├── pagination/             ← pagination controls
+│           │   ├── Pagination.tsx          ← Pagination.stories.tsx
+│           │   └── PerPageSelector.tsx     ← PerPageSelector.stories.tsx
+│           └── ui/                     ← generic reusable components
+│               ├── Button.tsx              ← Button.stories.tsx
+│               ├── Input.tsx               ← Input.stories.tsx
+│               ├── BackButton.tsx          ← BackButton.stories.tsx
+│               └── LoadingSpinner.tsx      ← LoadingSpinner.stories.tsx
 ├── docker-compose.yml              ← postgres + backend + frontend
 └── .env.example
-└── .env
 ```

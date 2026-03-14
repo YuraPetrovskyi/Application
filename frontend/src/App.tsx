@@ -1,8 +1,10 @@
 import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import Navbar from "./components/Navbar";
-import ProtectedRoute from "./components/ProtectedRoute";
+import Navbar from "./components/layout/Navbar";
+import ProtectedRoute from "./components/layout/ProtectedRoute";
+import AssistantDrawer from "./components/ai/AssistantDrawer";
+import AIAssistantFAB from "./components/ai/AIAssistantFAB";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import EventsListPage from "./pages/EventsListPage";
@@ -12,7 +14,7 @@ import EditEventPage from "./pages/EditEventPage";
 import MyEventsPage from "./pages/MyEventsPage";
 import { useAppDispatch, useAppSelector } from "./hooks/useAppStore";
 import { fetchMe } from "./store/slices/authSlice";
-import LoadingSpinner from "./components/LoadingSpinner";
+import LoadingSpinner from "./components/ui/LoadingSpinner";
 
 function AppRoutes() {
   const dispatch = useAppDispatch();
@@ -27,6 +29,8 @@ function AppRoutes() {
   return (
     <>
       <Navbar />
+      <AssistantDrawer />
+      <AIAssistantFAB />
       <main>
         <Routes>
           <Route path="/" element={<EventsListPage />} />

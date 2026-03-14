@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import type { CalendarEvent } from "./types";
+import { getTagColor } from "../../utils/tagColors";
 
 interface Props {
   events: CalendarEvent[];
@@ -54,21 +55,28 @@ export default function WeekView({
                     No Events
                   </p>
                 ) : (
-                  dayEvents.map((e) => (
-                    <div
-                      key={e.id}
-                      onClick={() => onSelectEvent(e)}
-                      title={e.title}
-                      className="bg-indigo-50 border border-indigo-200 rounded px-1.5 py-1 cursor-pointer hover:bg-indigo-100 transition-colors"
-                    >
-                      <p className="text-[10px] text-indigo-400 font-semibold">
-                        {dayjs(e.start).format("H:mm")}
-                      </p>
-                      <p className="text-xs text-indigo-800 font-medium truncate">
-                        {e.title}
-                      </p>
-                    </div>
-                  ))
+                  dayEvents.map((e) => {
+                    const color = getTagColor(e.resource.tags?.[0]?.name);
+                    return (
+                      <div
+                        key={e.id}
+                        onClick={() => onSelectEvent(e)}
+                        title={e.title}
+                        className={`${color.bg} border ${color.border} rounded px-1.5 py-1 cursor-pointer ${color.hoverBg} transition-colors`}
+                      >
+                        <p
+                          className={`text-[10px] font-semibold ${color.text} opacity-60`}
+                        >
+                          {dayjs(e.start).format("H:mm")}
+                        </p>
+                        <p
+                          className={`text-xs ${color.text} font-medium truncate`}
+                        >
+                          {e.title}
+                        </p>
+                      </div>
+                    );
+                  })
                 )}
               </div>
             </div>

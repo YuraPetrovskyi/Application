@@ -8,11 +8,11 @@ import {
   leaveEvent,
   deleteEvent,
 } from "../store/slices/eventsSlice";
-import LoadingSpinner from "../components/LoadingSpinner";
-import ConfirmModal from "../components/ConfirmModal";
+import LoadingSpinner from "../components/ui/LoadingSpinner";
+import ConfirmModal from "../components/events/ConfirmModal";
+import BackButton from "../components/ui/BackButton";
 import toast from "react-hot-toast";
 import {
-  ArrowLeft,
   CalendarDays,
   MapPin,
   Users,
@@ -23,6 +23,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
+import TagChip from "../components/events/TagChip";
 
 export default function EventDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -73,7 +74,7 @@ export default function EventDetailsPage() {
   if (loading || !event) return <LoadingSpinner />;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
+    <div className="max-w-3xl mx-auto px-4 py-4">
       {showConfirm && (
         <ConfirmModal
           message="Are you sure you want to delete this event?"
@@ -82,15 +83,9 @@ export default function EventDetailsPage() {
         />
       )}
 
-      <button
-        onClick={() => navigate(-1)}
-        className="text-gray-500 hover:text-indigo-600 mb-6 flex items-center gap-1.5 text-sm"
-      >
-        <ArrowLeft size={16} />
-        Back
-      </button>
+      <BackButton />
 
-      <div className="bg-white rounded-2xl border border-gray-200 p-8">
+      <div className="bg-white rounded-2xl border border-gray-200 p-8 mt-4">
         <div className="flex flex-wrap items-start justify-between gap-2 mb-6 ">
           <div>
             <span className="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded-lg font-medium">
@@ -124,6 +119,14 @@ export default function EventDetailsPage() {
         <p className="text-gray-600 leading-relaxed mb-6 text-lg font-medium break-words">
           {event.description}
         </p>
+
+        {event.tags && event.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-6">
+            {event.tags.map((tag) => (
+              <TagChip key={tag.id} tag={tag} size="md" />
+            ))}
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           <div className="bg-gray-50 rounded-xl p-4">
