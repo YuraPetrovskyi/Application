@@ -1,12 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
 import { fetchMyEvents } from "../store/slices/eventsSlice";
-import LoadingSpinner from "../components/ui/LoadingSpinner";
+import LoadingSpinner from "../components/LoadingSpinner";
 import { Plus, ChevronRight, ChevronLeft } from "lucide-react";
 import type { AppView, CalendarEvent } from "../components/calendar/types";
-import { useUIStore } from "../store/useUIStore";
 import MonthView from "../components/calendar/MonthView";
 import WeekView from "../components/calendar/WeekView";
 import DayView from "../components/calendar/DayView";
@@ -25,16 +24,23 @@ export default function MyEventsPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { myEvents, loading } = useAppSelector((s) => s.events);
-  const {
-    calendarView: view,
-    setCalendarView,
-    calendarDate,
-    setCalendarDate,
-  } = useUIStore();
-  const currentDate = new Date(calendarDate);
+  const [view, setView] = useState<AppView>(
+    () => (localStorage.getItem("calendarView") as AppView | null) ?? "month",
+  );
 
-  const handleSetView = (v: AppView) => setCalendarView(v);
-  const handleDateChange = (date: Date) => setCalendarDate(date);
+  const handleSetView = (v: AppView) => {
+    localStorage.setItem("calendarView", v);
+    setView(v);
+  };
+  const [currentDate, setCurrentDate] = useState<Date>(() => {
+    const saved = localStorage.getItem("calendarDate");
+    return saved ? new Date(saved) : new Date();
+  });
+
+  const handleDateChange = (date: Date) => {
+    localStorage.setItem("calendarDate", date.toISOString());
+    setCurrentDate(date);
+  };
 
   useEffect(() => {
     dispatch(fetchMyEvents());

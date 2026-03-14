@@ -1,14 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import { useAppDispatch, useAppSelector } from "../hooks/useAppStore";
 import { fetchEvent, updateEvent } from "../store/slices/eventsSlice";
-import { fetchTags } from "../store/slices/tagsSlice";
-import TagSelector from "../components/events/TagSelector";
-import LoadingSpinner from "../components/ui/LoadingSpinner";
-import BackButton from "../components/ui/BackButton";
+import LoadingSpinner from "../components/LoadingSpinner";
 import toast from "react-hot-toast";
+import { ArrowLeft } from "lucide-react";
 
 interface FormData {
   title: string;
@@ -25,12 +23,6 @@ export default function EditEventPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { currentEvent: event, loading } = useAppSelector((s) => s.events);
-  const { tags } = useAppSelector((s) => s.tags);
-  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (tags.length === 0) dispatch(fetchTags());
-  }, [dispatch, tags.length]);
 
   const {
     register,
@@ -56,7 +48,6 @@ export default function EditEventPage() {
         capacity: event.capacity?.toString() || "",
         visibility: event.visibility,
       });
-      setSelectedTagIds(event.tags?.map((t) => t.id) ?? []);
     }
   }, [event]);
 
@@ -69,7 +60,6 @@ export default function EditEventPage() {
         location: data.location,
         capacity: data.capacity !== "" ? Number(data.capacity) : null,
         visibility: data.visibility,
-        tagIds: selectedTagIds,
       };
       await dispatch(updateEvent({ id: id!, data: payload })).unwrap();
       toast.success("Event updated!");
@@ -87,9 +77,15 @@ export default function EditEventPage() {
   const errorClass = "text-red-500 text-xs mt-1";
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-4">
-      <BackButton />
-      <div className="bg-white rounded-2xl border border-gray-200 p-8 mt-4">
+    <div className="max-w-2xl mx-auto px-4 py-8">
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center gap-1.5 text-gray-500 hover:text-indigo-600 mb-6 text-sm transition-colors"
+      >
+        <ArrowLeft size={16} />
+        Back
+      </button>
+      <div className="bg-white rounded-2xl border border-gray-200 p-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Edit Event</h1>
           <p className="text-gray-500 mt-1">Update event details</p>
@@ -227,20 +223,6 @@ export default function EditEventPage() {
                 </span>
               </label>
             </div>
-          </div>
-
-          <div>
-            <label className={labelClass}>
-              Tags{" "}
-              <span className="text-gray-400 font-normal">
-                (optional, max 5)
-              </span>
-            </label>
-            <TagSelector
-              tags={tags}
-              selectedIds={selectedTagIds}
-              onChange={setSelectedTagIds}
-            />
           </div>
 
           <div className="flex gap-3 pt-2">
