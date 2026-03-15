@@ -21,7 +21,6 @@ interface FormData {
 export default function CreateEventPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { loading } = useAppSelector((s) => s.events);
   const { tags } = useAppSelector((s) => s.tags);
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
