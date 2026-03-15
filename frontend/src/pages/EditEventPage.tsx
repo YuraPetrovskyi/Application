@@ -38,7 +38,7 @@ export default function EditEventPage() {
     reset,
     getValues,
     trigger,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<FormData>({ mode: "onTouched" });
 
   useEffect(() => {
@@ -253,10 +253,10 @@ export default function EditEventPage() {
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={isSubmitting}
               className="flex-1 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50 transition-colors"
             >
-              {loading ? "Saving..." : "Save Changes"}
+              {isSubmitting ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </form>

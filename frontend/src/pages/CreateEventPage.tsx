@@ -21,7 +21,6 @@ interface FormData {
 export default function CreateEventPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { loading } = useAppSelector((s) => s.events);
   const { tags } = useAppSelector((s) => s.tags);
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
@@ -34,7 +33,7 @@ export default function CreateEventPage() {
     handleSubmit,
     getValues,
     trigger,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<FormData>({
     defaultValues: { visibility: "PUBLIC" },
     mode: "onTouched",
@@ -234,10 +233,10 @@ export default function CreateEventPage() {
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={isSubmitting}
               className="flex-1 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50 transition-colors"
             >
-              {loading ? "Creating..." : "Create Event"}
+              {isSubmitting ? "Creating..." : "Create Event"}
             </button>
           </div>
         </form>
